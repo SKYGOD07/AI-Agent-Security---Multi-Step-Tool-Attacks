@@ -20,3 +20,6 @@ agent-debug.jsonl
 transcript.log
 artifacts/
 tmp/
+
+# other works
+__zother_work__/
