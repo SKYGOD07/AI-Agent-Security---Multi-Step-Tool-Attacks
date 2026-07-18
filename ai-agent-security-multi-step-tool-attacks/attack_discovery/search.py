@@ -297,7 +297,7 @@ class NoveltySearch(SearchStrategy):
 
         env.reset()
         initial_snap = env.snapshot()
-        active_paths = [(initial_snap, [], cell_signature([]).get("hash"))]
+        active_paths = [(initial_snap, [], cell_signature([]).hash)]
 
         while not timebox.expired(buffer_s=3.0) and active_paths:
             # Selection: random selection of active paths to ensure diversity.
