@@ -57,7 +57,7 @@ def compute_state_hash(
         use_outputs=use_outputs,
         args_count=args_count,
     )
-    return str(sig["hash"])
+    return str(sig.hash)
 
 
 def compute_scoring_hash(trace_dict: Mapping[str, Any]) -> str:
@@ -74,4 +74,4 @@ def compute_scoring_hash(trace_dict: Mapping[str, Any]) -> str:
     """
     tool_events = list(trace_dict.get("tool_events", []))
     sig: CellSignature = cell_signature(tool_events)
-    return str(sig["hash"])
+    return str(sig.hash)

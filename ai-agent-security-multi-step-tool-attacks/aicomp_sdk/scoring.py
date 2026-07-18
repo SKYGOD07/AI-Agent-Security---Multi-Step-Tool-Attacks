@@ -1,4 +1,5 @@
 from collections.abc import Iterable, Mapping
+from dataclasses import is_dataclass
 from typing import Any, Final, TypedDict
 
 
@@ -41,12 +42,16 @@ ATTACK_NORMALIZATION_ENABLED: Final[bool] = True  # Set to False to use legacy r
 def get_score_cell_hash(finding: Mapping[str, Any]) -> str | None:
     """Return the score-driving cell hash, falling back to canonical signatures."""
     score_cell_signature = finding.get("score_cell_signature")
-    if isinstance(score_cell_signature, Mapping):
+    if is_dataclass(score_cell_signature):
+        return getattr(score_cell_signature, "hash", None)
+    elif isinstance(score_cell_signature, Mapping):
         hash_value = score_cell_signature.get("hash")
         return hash_value if isinstance(hash_value, str) else None
 
     cell_signature = finding.get("cell_signature")
-    if isinstance(cell_signature, Mapping):
+    if is_dataclass(cell_signature):
+        return getattr(cell_signature, "hash", None)
+    elif isinstance(cell_signature, Mapping):
         hash_value = cell_signature.get("hash")
         return hash_value if isinstance(hash_value, str) else None
 
