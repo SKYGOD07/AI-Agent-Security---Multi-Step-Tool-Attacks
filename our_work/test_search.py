@@ -58,11 +58,9 @@ def run_tests() -> None:
     print(f"Novelty Search found {len(findings)} findings.")
 
     # 4. Test AttackAlgorithm submission interface
-    print("\n--- Testing Submission AttackAlgorithm Class ---")
+    print("\n--- Testing v9 Adaptive Replay-Portfolio Optimizer Submission AttackAlgorithm Class ---")
     submission = AttackAlgorithm({
-        "strategy": "go_explore",
-        "target_candidate_count": 10,
-        "branch_batch": 2
+        "max_candidates": 10
     })
     final_candidates = submission.run(env, run_config)
     print(f"Submission generated {len(final_candidates)} candidates.")
