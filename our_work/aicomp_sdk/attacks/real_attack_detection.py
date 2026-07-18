@@ -48,10 +48,12 @@ def detect_real_attacks(events: Sequence[dict[str, Any]]) -> list[dict[str, Any]
         "1.",
     ]
 
+    injection_re = re.compile("|".join(re.escape(p) for p in injection_phrases), re.IGNORECASE)
+
     for i, event in enumerate(events):
         if event.get("source") in ["web", "email", "file"] and event.get("ok"):
-            output = str(event.get("output", "")).lower()
-            has_injection = any(phrase in output for phrase in injection_phrases)
+            output = str(event.get("output", ""))
+            has_injection = bool(injection_re.search(output))
 
             if has_injection and i + 1 < len(events):
                 next_event = events[i + 1]
