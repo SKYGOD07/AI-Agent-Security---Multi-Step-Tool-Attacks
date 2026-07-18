@@ -457,6 +457,8 @@ class BaseGateway:
             # `num_existing_mounts` is probably an underestimate - the gateway may not have access to mounts in the user space.
             mount_process = subprocess.run(['mount'], check=True, capture_output=True)
             num_existing_mounts: int = len(mount_process.stdout.splitlines())
+            mount_output = subprocess.run(['mount'], check=True, capture_output=True)
+            num_existing_mounts: int = len(mount_output.stdout.splitlines())
             if num_existing_mounts + len(input_paths) > self._max_total_mounts:
                 # We could technically run past this error and fall back to cp as usual, but the intent is to
                 # make the problem visible to the competition's creator during pre-launch testing.
