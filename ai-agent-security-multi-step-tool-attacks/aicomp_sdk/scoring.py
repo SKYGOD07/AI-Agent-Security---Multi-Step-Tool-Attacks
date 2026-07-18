@@ -1,4 +1,5 @@
 from collections.abc import Iterable, Mapping
+from dataclasses import is_dataclass
 from typing import Any, Final, TypedDict
 
 from aicomp_sdk.core.cells import CellSignature

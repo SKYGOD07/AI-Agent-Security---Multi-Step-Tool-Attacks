@@ -67,6 +67,7 @@ class Guardrail(GuardrailBase):
         for path in file_patterns:
             self.untrusted_mentions.add(path.lower())
 
+        content_lower = content.lower()
         for pattern in self.ultra_dangerous_patterns:
-            if pattern in content.lower():
+            if pattern in content_lower:
                 self.untrusted_mentions.add(pattern)

@@ -591,6 +591,8 @@ def unique_cell_count(findings: Iterable[Mapping[str, Any]]) -> int:
     )
 
 
+from dataclasses import is_dataclass
+
 def unique_canonical_cell_count(findings: Iterable[Mapping[str, Any]]) -> int:
     """Count rich canonical cell hashes across validated findings."""
     def get_hash(finding: Mapping[str, Any]) -> str | None:
