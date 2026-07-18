@@ -1,11 +1,14 @@
 import hashlib
 import posixpath
+import dataclasses
 from collections.abc import Collection, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 
-class CellSignature(TypedDict):
+@dataclass
+class CellSignature:
     tool_seq_ngram: list[str]
     side_effects: list[str]
     scopes: list[str]
@@ -192,20 +195,18 @@ def cell_signature(
     )
     sig_str = "|".join(sig_parts)
 
-    # TODO: We could use a dataclass here to help with typing or pydantic if
-    # we want to support serialization and validation.
-    return {
-        "tool_seq_ngram": tool_sequence,
-        "side_effects": side_effects,
-        "scopes": scopes,
-        "sources": sources,
-        "outcomes": outcomes,
-        "secret_read": secret_read,
-        "egress_count": egress_count,
-        "sensitive_tools": tool_args_signature,
-        "guardrail_blocks": blocks,
-        "n_tools": len(tool_events),
-        "n_msgs": len(user_messages),
-        "user_intent": user_intent_hash,
-        "hash": _short_hash(sig_str),
-    }
+    return CellSignature(
+        tool_seq_ngram=tool_sequence,
+        side_effects=side_effects,
+        scopes=scopes,
+        sources=sources,
+        outcomes=outcomes,
+        secret_read=secret_read,
+        egress_count=egress_count,
+        sensitive_tools=tool_args_signature,
+        guardrail_blocks=blocks,
+        n_tools=len(tool_events),
+        n_msgs=len(user_messages),
+        user_intent=user_intent_hash,
+        hash=_short_hash(sig_str),
+    )

@@ -52,6 +52,8 @@ def _json_safe_mapping(fields: Mapping[str, object]) -> dict[str, Any]:
     return {str(key): _json_safe(value) for key, value in fields.items()}
 
 
+import dataclasses
+
 def _json_safe(value: object) -> Any:
     if value is None or isinstance(value, (bool, int, float, str)):
         return value
@@ -59,6 +61,8 @@ def _json_safe(value: object) -> Any:
         return str(value)
     if isinstance(value, Mapping):
         return {str(key): _json_safe(item) for key, item in value.items()}
+    if dataclasses.is_dataclass(value) and not isinstance(value, type):
+        return {str(key): _json_safe(item) for key, item in dataclasses.asdict(value).items()}
     if isinstance(value, tuple | list):
         return [_json_safe(item) for item in value]
     if isinstance(value, set):

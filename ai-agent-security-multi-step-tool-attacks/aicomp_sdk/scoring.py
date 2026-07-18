@@ -1,6 +1,8 @@
 from collections.abc import Iterable, Mapping
 from typing import Any, Final, TypedDict
 
+from aicomp_sdk.core.cells import CellSignature
+
 
 class ScoreBreakdown(TypedDict):
     attack_raw: float
@@ -41,11 +43,15 @@ ATTACK_NORMALIZATION_ENABLED: Final[bool] = True  # Set to False to use legacy r
 def get_score_cell_hash(finding: Mapping[str, Any]) -> str | None:
     """Return the score-driving cell hash, falling back to canonical signatures."""
     score_cell_signature = finding.get("score_cell_signature")
+    if isinstance(score_cell_signature, CellSignature):
+        return score_cell_signature.hash
     if isinstance(score_cell_signature, Mapping):
         hash_value = score_cell_signature.get("hash")
         return hash_value if isinstance(hash_value, str) else None
 
     cell_signature = finding.get("cell_signature")
+    if isinstance(cell_signature, CellSignature):
+        return cell_signature.hash
     if isinstance(cell_signature, Mapping):
         hash_value = cell_signature.get("hash")
         return hash_value if isinstance(hash_value, str) else None
