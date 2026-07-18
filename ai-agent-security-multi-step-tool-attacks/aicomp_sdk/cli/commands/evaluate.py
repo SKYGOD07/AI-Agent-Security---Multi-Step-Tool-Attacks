@@ -215,7 +215,14 @@ def _write_outputs(
 ) -> None:
     artifacts.dir_path.mkdir(parents=True, exist_ok=True)
     artifacts.score_path.write_text(f"{final_score}\n", encoding="utf-8")
-    artifacts.report_path.write_text(json.dumps(details, indent=2), encoding="utf-8")
+
+    import dataclasses
+    def _default_encoder(obj):
+        if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+            return dataclasses.asdict(obj)
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+    artifacts.report_path.write_text(json.dumps(details, indent=2, default=_default_encoder), encoding="utf-8")
     print(f"\nArtifacts written to: {artifacts.dir_path}", flush=True)
     print(f"Score written to: {artifacts.score_path}", flush=True)
     print(f"Report written to: {artifacts.report_path}", flush=True)

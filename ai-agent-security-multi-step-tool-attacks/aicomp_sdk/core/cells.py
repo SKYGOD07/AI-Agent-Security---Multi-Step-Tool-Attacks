@@ -1,5 +1,6 @@
 import hashlib
 import posixpath
+import dataclasses
 from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path

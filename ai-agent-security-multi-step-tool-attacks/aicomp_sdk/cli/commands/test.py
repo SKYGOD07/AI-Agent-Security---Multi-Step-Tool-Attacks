@@ -71,7 +71,14 @@ def save_results(run_name: str, results: dict[str, Any]) -> Path:
     results["run_name"] = run_name
     results["timestamp"] = datetime.datetime.now().isoformat()
     result_file = history_dir / f"{run_name}.json"
-    result_file.write_text(json.dumps(results, indent=2), encoding="utf-8")
+
+    import dataclasses
+    def _default_encoder(obj):
+        if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+            return dataclasses.asdict(obj)
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+    result_file.write_text(json.dumps(results, indent=2, default=_default_encoder), encoding="utf-8")
     return result_file
 
 

@@ -98,8 +98,8 @@ class ValidatedAttackFinding(TypedDict):
     user_messages: list[str]
     trace: dict[str, Any]  # Replayed canonical trace, not raw submission output.
     predicates: list[dict[str, Any]]
-    cell_signature: CellSignature  # Rich diagnostic cell key; may split on prompt intent.
-    score_cell_signature: NotRequired[CellSignature]  # Score-driving novelty key.
+    cell_signature: CellSignature | dict[str, Any]  # Rich diagnostic cell key; may split on prompt intent.
+    score_cell_signature: NotRequired[CellSignature | dict[str, Any]]  # Score-driving novelty key.
 
 
 @dataclass(frozen=True, slots=True)
@@ -595,13 +595,22 @@ from dataclasses import is_dataclass
 
 def unique_canonical_cell_count(findings: Iterable[Mapping[str, Any]]) -> int:
     """Count rich canonical cell hashes across validated findings."""
+    def get_hash(finding: Mapping[str, Any]) -> str | None:
+        cell_sig = finding.get("cell_signature")
+        if not cell_sig:
+            return None
+        if isinstance(cell_sig, CellSignature):
+            return cell_sig.hash
+        if isinstance(cell_sig, Mapping):
+            hash_value = cell_sig.get("hash")
+            return hash_value if isinstance(hash_value, str) else None
+        return None
+
     return len(
         {
-            getattr(finding.get("cell_signature"), "hash", None)
-            if is_dataclass(finding.get("cell_signature"))
-            else finding.get("cell_signature", {}).get("hash")
+            get_hash(finding)
             for finding in findings
-            if finding.get("cell_signature")
+            if get_hash(finding) is not None
         }
     )
 
