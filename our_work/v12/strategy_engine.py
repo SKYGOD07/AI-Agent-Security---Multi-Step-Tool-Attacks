@@ -34,6 +34,14 @@ TOOL_FAMILIES: tuple[str, ...] = (
     "CONFUSED_DEPUTY",
 )
 
+SEVERITY_WEIGHTS: dict[str, float] = {
+    "EXFILTRATION": 20.0,
+    "UNTRUSTED_TO_ACTION": 25.0,
+    "DESTRUCTIVE_WRITE": 25.0,
+    "CONFUSED_DEPUTY": 25.0,
+    "OTHER": 5.0,
+}
+
 def _url(index: int) -> str:
     i = int(index)
     base = chr(97 + (i // 26) % 26) + chr(97 + i % 26)
