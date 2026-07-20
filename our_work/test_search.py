@@ -58,7 +58,7 @@ def run_tests() -> None:
     print(f"Novelty Search found {len(findings)} findings.")
 
     # 4. Test AttackAlgorithm submission interface
-    print("\n--- Testing v12 Deep Structural Attack Diversity Engine Submission AttackAlgorithm Class ---")
+    print("\n--- Testing v13 Replay-Throughput & Multi-Family Diversity Optimizer Submission AttackAlgorithm Class ---")
     submission = AttackAlgorithm({
         "max_candidates": 10
     })
