@@ -23,18 +23,29 @@ class BehavioralArchive:
         self.family_counts: dict[str, int] = {}
 
     @staticmethod
-    def _extract_tool_seq(trace: Sequence[Any]) -> str:
+    def _extract_tool_seq(trace: Sequence[Any] | Any) -> str:
         if not trace:
             return ""
+        if hasattr(trace, "tool_events"):
+            trace_events = getattr(trace, "tool_events", [])
+        elif isinstance(trace, dict) and "tool_events" in trace:
+            trace_events = trace["tool_events"]
+        elif isinstance(trace, (list, tuple)):
+            trace_events = trace
+        else:
+            trace_events = [trace]
+            
         names: list[str] = []
-        for step in trace:
+        for step in trace_events:
             if hasattr(step, "tool_name"):
                 names.append(str(getattr(step, "tool_name", "")))
             elif isinstance(step, dict) and "tool_name" in step:
                 names.append(str(step["tool_name"]))
+            elif isinstance(step, dict) and "tool" in step:
+                names.append(str(step["tool"]))
             else:
                 names.append(str(step))
-        return "->".join(names)
+        return "->".join([n for n in names if n])
 
     @classmethod
     def compute_semantic_signature(
