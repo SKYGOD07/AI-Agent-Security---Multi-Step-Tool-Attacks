@@ -42,6 +42,7 @@ class ProjectManager:
         proj_dir.mkdir(parents=True)
         (proj_dir / "versions").mkdir()
         (proj_dir / "skills").mkdir()
+        (proj_dir / "data").mkdir()
         
         context_data = {
             "name": name,

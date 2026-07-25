@@ -105,6 +105,8 @@ class ROSGatewayHandler(BaseHTTPRequestHandler):
             self._handle_create_notebook()
         elif path == "/api/writeup":
             self._handle_writeup()
+        elif path == "/api/chat":
+            self._handle_chat()
         else:
             self._json_response(404, {"error": "Not Found"})
 
@@ -181,17 +183,17 @@ class ROSGatewayHandler(BaseHTTPRequestHandler):
         # Try to parse the JSON output from LLM
         nodes = []
         try:
-            # Simple regex/find to extract json if it's wrapped in markdown ```json ... ```
             import re
-            match = re.search(r'```json\s*(\{.*?\})\s*```', llm_resp, re.DOTALL)
-            if match:
-                parsed = json.loads(match.group(1))
+            clean_resp = llm_resp.replace("```json", "").replace("```", "").strip()
+            start = clean_resp.find('{')
+            end = clean_resp.rfind('}')
+            if start != -1 and end != -1:
+                parsed = json.loads(clean_resp[start:end+1])
             else:
-                parsed = json.loads(llm_resp)
+                parsed = json.loads(clean_resp)
             nodes = parsed.get("nodes", [])
         except Exception as e:
             print("Failed to parse LLM JSON:", e)
-            # Fallback to simple parser if LLM output isn't perfect JSON
             nodes.append({
                 "id": "n_error", "type": "event", "label": "LLM Parsing Failed",
                 "x": 200, "y": 150, "data": {"raw": llm_resp}
@@ -224,6 +226,43 @@ class ROSGatewayHandler(BaseHTTPRequestHandler):
         gen = WriteupGenerator(proj_dir)
         writeup = gen.generate(context, self._smart_generate)
         self._json_response(200, {"writeup": writeup})
+
+    def _handle_chat(self):
+        body = self._read_body()
+        message = body.get("message", "")
+        proj_dir = pm.get_project_dir()
+        
+        if not proj_dir:
+            self._json_response(400, {"error": "No active project"})
+            return
+            
+        chat_file = proj_dir / "chat_history.json"
+        history = []
+        if chat_file.exists():
+            try:
+                history = json.loads(chat_file.read_text())
+            except Exception:
+                pass
+                
+        if body.get("fetch_only", False):
+            self._json_response(200, {"history": history})
+            return
+            
+        history.append({"role": "user", "content": message})
+        
+        # Build prompt from history
+        prompt = "Conversation History:\n"
+        for h in history[-6:]:
+            prompt += f"{h['role']}: {h['content']}\n"
+        prompt += "\nAssistant:"
+        
+        system_prompt = "You are an AI assistant helping a Kaggle Grandmaster understand and modify code."
+        response = self._smart_generate(prompt, system_prompt)
+        
+        history.append({"role": "assistant", "content": response})
+        chat_file.write_text(json.dumps(history, indent=2))
+        
+        self._json_response(200, {"history": history})
 
 
     # ------------------------------------------------------------------ LLM Utils
