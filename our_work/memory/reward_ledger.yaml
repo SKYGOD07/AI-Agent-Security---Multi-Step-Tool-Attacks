@@ -1,0 +1,56 @@
+strategies:
+  Template_Racing:
+    times_tried: 3
+    times_succeeded: 3
+    avg_score_impact: "+80"
+    caused_failures: false
+    improved_replay_score: true
+    status: PREFERRED
+
+  Replay_Safe_Latency_Cap:
+    times_tried: 2
+    times_succeeded: 2
+    avg_score_impact: "+High (Prevents Timeout)"
+    caused_failures: false
+    improved_replay_score: true
+    status: PREFERRED
+
+  Semantic_Deduplication:
+    times_tried: 1
+    times_succeeded: 0
+    avg_score_impact: "pending v20"
+    caused_failures: false
+    improved_replay_score: "pending"
+    status: TESTING
+
+  Controlled_Live_Diversity:
+    times_tried: 1
+    times_succeeded: 0
+    avg_score_impact: "pending v20"
+    caused_failures: false
+    improved_replay_score: "pending"
+    status: TESTING
+
+  Unverified_Static_Padding:
+    times_tried: 2
+    times_succeeded: 0
+    avg_score_impact: "-Collapse to 0 / Timeout"
+    caused_failures: true
+    improved_replay_score: false
+    status: BLACKLISTED
+
+  Multi_Armed_Bandit_Search:
+    times_tried: 1
+    times_succeeded: 0
+    avg_score_impact: "-35"
+    caused_failures: false
+    improved_replay_score: false
+    status: BLACKLISTED
+
+  Multi_Instruction_Burst_K:
+    times_tried: 1
+    times_succeeded: 0
+    avg_score_impact: "-30"
+    caused_failures: false
+    improved_replay_score: false
+    status: BLACKLISTED
