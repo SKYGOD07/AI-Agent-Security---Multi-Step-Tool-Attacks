@@ -1,5 +1,5 @@
 def show_dashboard():
-    print(\"\"\"
+    print("""
 =========================================
       RESEARCH OPERATING SYSTEM (ROS)
 =========================================
@@ -16,7 +16,7 @@ Highest Risk Strategy:       Predicate Explosion
 
 [ NEXT RECOMMENDED EXPERIMENT ]
 Priority 1: Replay Budget Ablation (Expected Gain: +2.4)
-\"\"\")
+""")
 
 if __name__ == '__main__':
     show_dashboard()
