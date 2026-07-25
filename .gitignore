@@ -29,4 +29,8 @@ ZIP FILES/
 *.tgz
 
 local_only/
+node_modules/
+web/node_modules/
+web/dist/
+.vite/
 

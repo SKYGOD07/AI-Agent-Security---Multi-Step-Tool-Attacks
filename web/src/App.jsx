@@ -1,184 +1,384 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+const API = 'http://127.0.0.1:8022';
+
+const PALETTE_ITEMS = [
+  { type: 'event', label: 'Event BeginPlay', icon: 'E', color: '#991b1b' },
+  { type: 'function', label: 'Probe Templates', icon: 'F', color: '#1d4ed8' },
+  { type: 'function', label: 'Template Race', icon: 'F', color: '#1d4ed8' },
+  { type: 'function', label: 'Replay Fill', icon: 'F', color: '#1d4ed8' },
+  { type: 'variable', label: 'Latency Cap 8910s', icon: 'V', color: '#15803d' },
+  { type: 'variable', label: 'Semantic Dedup', icon: 'V', color: '#15803d' },
+  { type: 'ai', label: 'Ollama Generate', icon: 'AI', color: '#7c3aed' },
+  { type: 'ai', label: 'GLM-4 Cloud', icon: 'AI', color: '#7c3aed' },
+  { type: 'save', label: 'Save To Disk', icon: 'S', color: '#d97706' },
+];
+
+const DEFAULT_NODES = [
+  { id: 'n1', type: 'event', label: 'Event BeginPlay', x: 60, y: 80,
+    pins: { out: [{ name: 'Exec', kind: 'exec' }] } },
+  { id: 'n2', type: 'function', label: 'Probe Templates', x: 420, y: 60,
+    pins: { in: [{ name: 'Exec', kind: 'exec' }, { name: 'Templates', kind: 'string' }],
+            out: [{ name: 'Exec', kind: 'exec' }, { name: 'Results', kind: 'object' }] },
+    data: { templates: '5', reps: '5' } },
+  { id: 'n3', type: 'function', label: 'Template Race', x: 800, y: 60,
+    pins: { in: [{ name: 'Exec', kind: 'exec' }, { name: 'Probes', kind: 'object' }],
+            out: [{ name: 'Exec', kind: 'exec' }, { name: 'Winner', kind: 'string' }] },
+    data: { metric: 'effective_cost = median_latency / fire_rate' } },
+  { id: 'n4', type: 'function', label: 'Replay Fill', x: 1180, y: 60,
+    pins: { in: [{ name: 'Exec', kind: 'exec' }, { name: 'Template', kind: 'string' }, { name: 'Budget', kind: 'float' }],
+            out: [{ name: 'Exec', kind: 'exec' }, { name: 'Candidates', kind: 'object' }] },
+    data: { budget: '8910', method: 'measured_latency_cumulative' } },
+  { id: 'n5', type: 'ai', label: 'Ollama Generate', x: 420, y: 360,
+    pins: { in: [{ name: 'Exec', kind: 'exec' }, { name: 'Prompt', kind: 'string' }],
+            out: [{ name: 'Exec', kind: 'exec' }, { name: 'Response', kind: 'string' }] },
+    data: { prompt: '', provider: 'auto' } },
+  { id: 'n6', type: 'save', label: 'Save To Disk', x: 800, y: 360,
+    pins: { in: [{ name: 'Exec', kind: 'exec' }, { name: 'Version', kind: 'string' }, { name: 'Code', kind: 'string' }] },
+    data: { version: 'v21' } },
+];
 
 export default function App() {
+  const [nodes, setNodes] = useState(DEFAULT_NODES);
+  const [selectedId, setSelectedId] = useState(null);
   const [health, setHealth] = useState(null);
-  const [graph, setGraph] = useState(null);
-  const [roadmap, setRoadmap] = useState([]);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [activeTab, setActiveTab] = useState('canvas');
-  const [activeProvider, setActiveProvider] = useState('Ollama Local');
+  const [toast, setToast] = useState(null);
+  const [aiResponse, setAiResponse] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const dragRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [healthRes, graphRes, roadmapRes] = await Promise.all([
-          fetch('http://127.0.0.1:8022/api/health').then(r => r.json()),
-          fetch('http://127.0.0.1:8022/api/graph').then(r => r.json()),
-          fetch('http://127.0.0.1:8022/api/roadmap').then(r => r.json())
-        ]);
-        setHealth(healthRes);
-        setGraph(graphRes);
-        setRoadmap(roadmapRes.roadmap || []);
-      } catch (err) {
-        console.error("Gateway offline:", err);
-      }
-    }
-    fetchData();
+    fetch(`${API}/api/health`).then(r => r.json()).then(setHealth).catch(() => {});
   }, []);
 
-  const nodes = graph?.nodes || [
-    { id: 'v16', label: 'v16 Baseline', type: 'version', status: 'success', score: '87.660', strategy: 'Replay Throughput', evidence: 'VERIFIED' },
-    { id: 'v20', label: 'v20 Engine', type: 'version', status: 'pending', score: 'Pending', strategy: 'Controlled Live Diversity', evidence: 'HYPOTHESIS' },
-    { id: 'strat_relay', label: 'Template Racing', type: 'strategy', status: 'active', gain: '+80', evidence: 'STRONG_EVIDENCE' },
-    { id: 'strat_cap', label: '8910s Latency Cap', type: 'strategy', status: 'active', gain: 'Prevents Timeout', evidence: 'VERIFIED' },
-    { id: 'strat_dedup', label: 'Semantic Dedup', type: 'strategy', status: 'testing', gain: '+1.8', evidence: 'HYPOTHESIS' }
-  ];
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // ── Dragging ──
+  const onMouseDown = useCallback((e, nodeId) => {
+    if (e.button !== 0) return;
+    const node = nodes.find(n => n.id === nodeId);
+    dragRef.current = { id: nodeId, startX: e.clientX - node.x, startY: e.clientY - node.y };
+    setSelectedId(nodeId);
+    e.stopPropagation();
+  }, [nodes]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragRef.current) return;
+      const { id, startX, startY } = dragRef.current;
+      setNodes(prev => prev.map(n => n.id === id ? { ...n, x: e.clientX - startX, y: e.clientY - startY } : n));
+    };
+    const onUp = () => { dragRef.current = null; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  }, []);
+
+  // ── Add node from palette ──
+  const addNode = (item) => {
+    const id = `n${Date.now()}`;
+    setNodes(prev => [...prev, {
+      id, type: item.type, label: item.label,
+      x: 200 + Math.random() * 400, y: 150 + Math.random() * 200,
+      pins: {
+        in: item.type !== 'event' ? [{ name: 'Exec', kind: 'exec' }] : undefined,
+        out: [{ name: 'Exec', kind: 'exec' }],
+      },
+      data: item.type === 'ai' ? { prompt: '', provider: 'auto' } : {},
+    }]);
+  };
+
+  // ── Delete selected ──
+  const deleteSelected = () => {
+    if (!selectedId) return;
+    setNodes(prev => prev.filter(n => n.id !== selectedId));
+    setSelectedId(null);
+  };
+
+  // ── Selected node ──
+  const selected = nodes.find(n => n.id === selectedId);
+
+  // ── Update node data ──
+  const updateNodeData = (key, val) => {
+    setNodes(prev => prev.map(n => n.id === selectedId ? { ...n, data: { ...n.data, [key]: val } } : n));
+  };
+
+  // ── Generate via Ollama/GLM ──
+  const runGenerate = async () => {
+    if (!selected?.data?.prompt) return;
+    setGenerating(true);
+    setAiResponse('');
+    try {
+      const res = await fetch(`${API}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: selected.data.prompt, provider: selected.data.provider || 'auto' }),
+      });
+      const data = await res.json();
+      setAiResponse(data.response || '');
+      showToast(`Generated via ${data.provider}`);
+    } catch (err) {
+      setAiResponse(`Error: ${err.message}`);
+      showToast('Generation failed', 'error');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // ── Save to disk ──
+  const saveToDisk = async () => {
+    const ver = selected?.data?.version || 'v_new';
+    const blueprint = { nodes: nodes.map(n => ({ id: n.id, type: n.type, label: n.label, x: n.x, y: n.y, data: n.data })) };
+    try {
+      const res = await fetch(`${API}/api/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          version: ver,
+          manifest: `# Auto-saved from ROS Blueprint Editor\nversion: ${ver}\nnodes: ${nodes.length}\narchitecture_fingerprint:\n${nodes.map(n => `  - ${n.label}`).join('\n')}\n`,
+          code: `# Blueprint: ${ver}\n# Nodes: ${nodes.map(n => n.label).join(' -> ')}\n# Generated by ROS Blueprint Editor\n`,
+        }),
+      });
+      const data = await res.json();
+      showToast(`Saved ${data.files?.length || 0} files to ${ver}/`);
+    } catch (err) {
+      showToast('Save failed', 'error');
+    }
+  };
+
+  // ── Pin color helper ──
+  const pinColor = (kind) => {
+    const map = { exec: '#fff', float: '#00cc66', string: '#ff00ff', object: '#0099ff', bool: '#cc0000' };
+    return map[kind] || '#888';
+  };
 
   return (
-    <div className="container">
-      {/* Header */}
-      <header className="header">
-        <div>
-          <h1 className="logo">RESEARCH OPERATING SYSTEM</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
-            Array-Level Visual Analysis & Decision Intelligence Platform (n8n Workspace)
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div className="status-badge">
-            <div className="status-dot"></div>
-            <span>{health?.status === 'online' ? 'GATEWAY: 127.0.0.1:8022' : 'GATEWAY: STANDBY'}</span>
+    <>
+      {/* ─── Top Bar ─── */}
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="topbar-logo">ROS BLUEPRINT EDITOR</span>
+          <div className="topbar-status">
+            <div className="topbar-dot" style={{ background: health?.status === 'online' ? '#22c55e' : '#ef4444' }}></div>
+            <span>{health?.status === 'online' ? 'Gateway Online' : 'Gateway Offline'}</span>
           </div>
-          <button className="btn" onClick={() => window.location.reload()}>Sync Gateway</button>
+          <div className="topbar-status" style={{ color: health?.ollama_available ? '#22c55e' : '#f59e0b' }}>
+            <div className="topbar-dot" style={{ background: health?.ollama_available ? '#22c55e' : '#f59e0b', boxShadow: `0 0 8px ${health?.ollama_available ? '#22c55e' : '#f59e0b'}` }}></div>
+            <span>{health?.ollama_available ? 'Ollama Connected' : 'Ollama Offline (GLM Fallback)'}</span>
+          </div>
         </div>
-      </header>
-
-      {/* Provider & Execution Bar */}
-      <div style={{ background: 'var(--bg-secondary)', padding: '1rem 1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)' }}>ACTIVE MODEL PROVIDER:</span>
-          <select 
-            value={activeProvider} 
-            onChange={(e) => setActiveProvider(e.target.value)}
-            style={{ background: 'var(--bg-primary)', color: 'var(--accent-cyan)', border: '1px solid var(--border-color)', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
-          >
-            <option value="Ollama Local">Ollama Local (http://127.0.0.1:11434)</option>
-            <option value="GLM-4 Cloud (ZhipuAI)">GLM-4 Cloud / GLM-4-Flash (API Key Active)</option>
-          </select>
-        </div>
-        <div style={{ fontSize: '0.85rem', color: 'var(--accent-green)', fontWeight: '600' }}>
-          Key Status: Configured in local_only/gateway_env.txt (Un-tracked)
+        <div className="topbar-right">
+          <button className="btn-sm" onClick={deleteSelected}>Delete Node</button>
+          <button className="btn-sm btn-primary" onClick={saveToDisk}>Save Blueprint</button>
         </div>
       </div>
 
-      {/* Interactive n8n-Style Workflow Canvas */}
-      <div className="n8n-canvas">
-        <div className="canvas-title">
-          <span>INTERACTIVE ARRAY-LEVEL DIGITAL DIAGRAM (N8N WORKFLOW STYLE)</span>
-          <span>CLICK ANY NODE TO INSPECT STRATEGY & CAUSAL EVIDENCE</span>
-        </div>
-
-        <div className="node-flow-grid">
-          {nodes.map((node, index) => (
-            <React.Fragment key={node.id}>
-              <div 
-                className={`n8n-node ${selectedNode?.id === node.id ? 'selected' : ''}`}
-                onClick={() => setSelectedNode(node)}
-              >
-                <div className="node-header">
-                  <div className="node-icon">{node.type === 'version' ? 'V' : 'S'}</div>
-                  <div>
-                    <div className="node-title">{node.label}</div>
-                    <div className="node-type">{node.type.toUpperCase()} NODE</div>
-                  </div>
-                </div>
-
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                  {node.score ? `Score: ${node.score}` : `Impact: ${node.gain}`}
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className={`badge ${node.evidence === 'VERIFIED' ? 'badge-verified' : 'badge-hypothesis'}`}>
-                    {node.evidence || 'HYPOTHESIS'}
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>Inspect →</span>
-                </div>
-              </div>
-
-              {index < nodes.length - 1 && <div className="connector-line"></div>}
-            </React.Fragment>
+      <div className="editor-layout">
+        {/* ─── Left Palette ─── */}
+        <div className="palette">
+          <div className="palette-title">Blueprint Nodes</div>
+          {PALETTE_ITEMS.map((item, i) => (
+            <div key={i} className="palette-item" onClick={() => addNode(item)}>
+              <div className="palette-icon" style={{ background: item.color }}>{item.icon}</div>
+              <span>{item.label}</span>
+            </div>
           ))}
-        </div>
-      </div>
 
-      {/* Inspector Panel for Selected Node */}
-      {selectedNode && (
-        <div className="inspector-drawer">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ color: 'var(--accent-cyan)', fontSize: '1.2rem' }}>
-              Node Strategy Analysis: {selectedNode.label}
-            </h3>
-            <button 
-              onClick={() => setSelectedNode(null)}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1rem' }}
-            >
-              ✕ Close Inspector
-            </button>
+          <div className="palette-title" style={{ marginTop: '1.5rem' }}>Quick Actions</div>
+          <div className="palette-item" onClick={() => window.open(`${API}/api/graph`, '_blank')}>
+            <div className="palette-icon" style={{ background: '#334155' }}>G</div>
+            <span>View Graph JSON</span>
           </div>
-
-          <div className="grid-2">
-            <div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>EVIDENCE & CAUSAL REASONING</p>
-              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
-                <div>Node ID: {selectedNode.id}</div>
-                <div>Evidence Tag: <span className="badge badge-verified">{selectedNode.evidence || 'HYPOTHESIS'}</span></div>
-                <div>Status: {selectedNode.status}</div>
-                <div style={{ marginTop: '0.5rem', color: 'var(--accent-cyan)' }}>
-                  Causal Chain: {selectedNode.id} → [MEASURED_LATENCY] → [PREVENTS_TIMEOUT] → HIGH_SCORE
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>RECOMMENDED ACTION</p>
-              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', fontSize: '0.85rem' }}>
-                <p>Preserve this node in the current baseline architecture. Avoid modifying latency caps or introducing unverified static padding.</p>
-              </div>
-            </div>
+          <div className="palette-item" onClick={() => window.open(`${API}/api/roadmap`, '_blank')}>
+            <div className="palette-icon" style={{ background: '#334155' }}>R</div>
+            <span>View Roadmap</span>
           </div>
         </div>
-      )}
 
-      {/* Decision Intelligence & Roadmap Grid */}
-      <div className="grid-2" style={{ marginTop: '2rem' }}>
-        <div className="card">
-          <div className="card-title">Decision Intelligence Priorities</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {roadmap.map(item => (
-              <div key={item.priority} style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', marginBottom: '0.3rem' }}>
-                  <span style={{ color: 'var(--accent-cyan)' }}>P{item.priority}: {item.experiment}</span>
-                  <span style={{ color: 'var(--accent-green)', fontFamily: 'var(--font-mono)' }}>{item.expected_gain}</span>
+        {/* ─── Blueprint Canvas ─── */}
+        <div className="canvas" ref={canvasRef} onClick={() => setSelectedId(null)}>
+          <div className="canvas-inner">
+            {/* Wire connections (simple line rendering) */}
+            <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+              {nodes.map((node, i) => {
+                if (i === 0) return null;
+                const prev = nodes[i - 1];
+                if (!prev) return null;
+                const x1 = prev.x + 280;
+                const y1 = prev.y + 30;
+                const x2 = node.x;
+                const y2 = node.y + 30;
+                const cx = (x1 + x2) / 2;
+                return (
+                  <path key={`wire-${i}`}
+                    d={`M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`}
+                    stroke="rgba(255,255,255,0.15)"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray={node.type === 'ai' ? '6 3' : 'none'}
+                  />
+                );
+              })}
+            </svg>
+
+            {/* Blueprint Nodes */}
+            {nodes.map(node => (
+              <div key={node.id}
+                className={`bp-node ${selectedId === node.id ? 'selected' : ''}`}
+                style={{ left: node.x, top: node.y }}
+                onMouseDown={(e) => onMouseDown(e, node.id)}
+                onClick={(e) => { e.stopPropagation(); setSelectedId(node.id); }}
+              >
+                <div className={`bp-node-header ${node.type}`}>
+                  <span>{node.label}</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{item.reason}</p>
-                <span className="badge badge-verified">{item.evidence_level}</span>
+                <div className="bp-node-body">
+                  {/* Input Pins */}
+                  {node.pins?.in?.map((pin, i) => (
+                    <div key={`in-${i}`} className="bp-pin-row">
+                      <div className="bp-pin">
+                        {pin.kind === 'exec'
+                          ? <div className="bp-pin-exec-arrow"></div>
+                          : <div className="bp-pin-dot" style={{ borderColor: pinColor(pin.kind) }}></div>
+                        }
+                        <span>{pin.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Output Pins */}
+                  {node.pins?.out?.map((pin, i) => (
+                    <div key={`out-${i}`} className="bp-pin-row" style={{ justifyContent: 'flex-end' }}>
+                      <div className="bp-pin" style={{ flexDirection: 'row-reverse' }}>
+                        {pin.kind === 'exec'
+                          ? <div className="bp-pin-exec-arrow"></div>
+                          : <div className="bp-pin-dot" style={{ borderColor: pinColor(pin.kind), background: pinColor(pin.kind) + '33' }}></div>
+                        }
+                        <span>{pin.name}</span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Node-specific inline data */}
+                  {node.data?.metric && (
+                    <div style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--accent)', fontFamily: 'var(--mono)' }}>
+                      {node.data.metric}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="card">
-          <div className="card-title">Local Gateway CLI Execution Commands</div>
-          <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.85rem', lineHeight: '1.6' }}>
-            <div style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}># Start Gateway Local Server:</div>
-            <div style={{ color: 'var(--accent-cyan)' }}>python -m uvicorn gateway.server:app --port 8022</div>
-            <div style={{ color: 'var(--text-secondary)', margin: '0.8rem 0 0.5rem 0' }}># Run Terminal Analysis Dashboard:</div>
-            <div style={{ color: 'var(--accent-cyan)' }}>python -m ros.cli.dashboard</div>
-            <div style={{ color: 'var(--text-secondary)', margin: '0.8rem 0 0.5rem 0' }}># Run Repository Self-Test Protocol:</div>
-            <div style={{ color: 'var(--accent-cyan)' }}>python -m ros.cli.selftest</div>
-          </div>
+        {/* ─── Right Inspector ─── */}
+        <div className="inspector">
+          {selected ? (
+            <>
+              <div className="inspector-title">Node Inspector: {selected.label}</div>
+
+              <div className="inspector-field">
+                <div className="inspector-label">NODE TYPE</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                  <span className={`badge-sm ${selected.type === 'event' ? 'badge-red' : selected.type === 'ai' ? 'badge-amber' : 'badge-green'}`}>
+                    {selected.type.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="inspector-field">
+                <div className="inspector-label">LABEL</div>
+                <input className="inspector-input" value={selected.label}
+                  onChange={e => setNodes(prev => prev.map(n => n.id === selected.id ? { ...n, label: e.target.value } : n))} />
+              </div>
+
+              <div className="inspector-field">
+                <div className="inspector-label">POSITION (X, Y)</div>
+                <div style={{ fontSize: '0.8rem', fontFamily: 'var(--mono)', color: 'var(--text-dim)' }}>
+                  {Math.round(selected.x)}, {Math.round(selected.y)}
+                </div>
+              </div>
+
+              {/* Data fields */}
+              {selected.data && Object.entries(selected.data).map(([key, val]) => (
+                <div className="inspector-field" key={key}>
+                  <div className="inspector-label">{key.toUpperCase()}</div>
+                  {key === 'prompt' ? (
+                    <textarea className="inspector-code" value={val}
+                      placeholder="Enter prompt for Ollama / GLM-4..."
+                      onChange={e => updateNodeData(key, e.target.value)} />
+                  ) : (
+                    <input className="inspector-input" value={val}
+                      onChange={e => updateNodeData(key, e.target.value)} />
+                  )}
+                </div>
+              ))}
+
+              {/* AI Generate Button */}
+              {selected.type === 'ai' && (
+                <div className="inspector-field">
+                  <button className="btn-sm btn-primary" style={{ width: '100%', padding: '0.6rem' }}
+                    onClick={runGenerate} disabled={generating}>
+                    {generating ? 'Generating...' : 'Run Ollama / GLM-4 Generation'}
+                  </button>
+                  {aiResponse && (
+                    <div style={{ marginTop: '0.6rem', background: '#0a0e1a', border: '1px solid #1e293b', borderRadius: '6px', padding: '0.6rem' }}>
+                      <div className="inspector-label">AI RESPONSE</div>
+                      <pre style={{ fontSize: '0.75rem', color: 'var(--accent)', fontFamily: 'var(--mono)', whiteSpace: 'pre-wrap', maxHeight: '200px', overflow: 'auto' }}>
+                        {aiResponse}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Save Button */}
+              {selected.type === 'save' && (
+                <div className="inspector-field">
+                  <button className="btn-sm btn-primary" style={{ width: '100%', padding: '0.6rem' }} onClick={saveToDisk}>
+                    Save Blueprint to Disk
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="inspector-title">Blueprint Overview</div>
+              <div className="inspector-field">
+                <div className="inspector-label">TOTAL NODES</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{nodes.length}</div>
+              </div>
+              <div className="inspector-field">
+                <div className="inspector-label">GATEWAY</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--green)', fontWeight: 600 }}>
+                  {health?.status === 'online' ? `Online (${health.workspace?.split('\\').pop()})` : 'Offline'}
+                </div>
+              </div>
+              <div className="inspector-field">
+                <div className="inspector-label">OLLAMA STATUS</div>
+                <div style={{ fontSize: '0.85rem', color: health?.ollama_available ? 'var(--green)' : 'var(--amber)', fontWeight: 600 }}>
+                  {health?.ollama_available ? 'Connected (127.0.0.1:11434)' : 'Offline - Using GLM-4 Cloud Fallback'}
+                </div>
+              </div>
+              <div className="inspector-field">
+                <div className="inspector-label">HOW TO USE</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                  Click palette items to add nodes. Drag nodes to position them.
+                  Click a node to inspect and edit its properties.
+                  Use AI nodes to generate prompts via Ollama or GLM-4 Cloud.
+                  Use Save nodes to persist your blueprint to disk.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Toast notifications */}
+      {toast && <div className={`toast toast-${toast.type}`}>{toast.msg}</div>}
+    </>
   );
 }
