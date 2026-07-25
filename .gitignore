@@ -27,3 +27,6 @@ ZIP FILES/
 *.zip
 *.tar.gz
 *.tgz
+
+local_only/
+
