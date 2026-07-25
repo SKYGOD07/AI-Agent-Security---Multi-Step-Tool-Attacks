@@ -1,0 +1,37 @@
+version: v20
+status: pending
+parent: v16
+
+research_question: >
+  Can we push past the 88.560 baseline by using controlled live diversity (decaying templates) and semantic deduplication without overflowing the replay budget?
+
+hypothesis:
+  expected_gain: 2.0
+  confidence: 0.68
+  evidence_level: HYPOTHESIS
+
+results:
+  public_score: unknown
+  predicted_score: 89.2
+  prediction_error: unknown
+
+architecture_fingerprint:
+  - linear
+  - replay
+  - probe
+  - select
+  - fill
+  - semantic_dedup
+  - controlled_diversity
+  - measured_latency_cap
+
+changes:
+  - added_semantic_deduplication
+  - added_controlled_live_diversity
+  - dynamic_decay_for_diversity_templates
+
+lessons:
+  - pending_evaluation
+
+next_candidates:
+  - v21_replay_ablation

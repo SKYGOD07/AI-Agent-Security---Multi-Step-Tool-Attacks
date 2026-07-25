@@ -1,0 +1,37 @@
+version: v16
+status: success
+parent: v15
+
+research_question: >
+  Can we recover the 88.560 baseline by restoring strict replay-throughput and eliminating unverified multi-predicate fill?
+
+hypothesis:
+  expected_gain: 15.0
+  confidence: 0.90
+  evidence_level: HYPOTHESIS
+
+results:
+  public_score: 87.660
+  predicted_score: 88.56
+  prediction_error: -0.90
+
+architecture_fingerprint:
+  - linear
+  - replay
+  - probe
+  - select
+  - fill
+  - measured_latency_cap
+
+changes:
+  - removed_unverified_padding
+  - added_measured_latency_cap
+  - strict_5_cell_scaffold
+
+lessons:
+  - Replay-safe sizing prevents ModelEvaluationTimedOut format errors. [VERIFIED]
+  - Unverified padding Dilutes the portfolio and wastes replay slots. [STRONG EVIDENCE]
+  - The v7 baseline architecture remains highly stable. [VERIFIED]
+
+next_candidates:
+  - v17_89_055_port
