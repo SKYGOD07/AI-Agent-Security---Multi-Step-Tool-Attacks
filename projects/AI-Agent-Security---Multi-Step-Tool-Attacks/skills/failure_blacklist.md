@@ -15,6 +15,9 @@
 ## v18: Scored 57.285 (regression from 87.660)
 **Root cause**: Same BURST_K=4 problem but in a different architecture. The v18 template-race design uses BURST_K=4 to create multi-post messages. Each candidate requires 4x the replay time. The fill loop does correctly verify each candidate fires, but the per-candidate cost is ~4x so fewer total candidates fit in the replay budget.
 
+## v23: Scored 53.190 (regression from 87.660)
+**Root cause**: `PROBE_HOPS=1` with `REPLAY_COST_COEF=2.0` miscalibrated the fill loop's stop condition. The `_replay_stop()` function estimates the next candidate's cost as `slowest * SLOWEST_MULT * replay_cost_coef`, but with hops-1 probing, `slowest` stays artificially low (~half of hops=8). The 2× coefficient doesn't compensate correctly because the stop condition uses `slowest * SLOWEST_MULT` (the cushion estimate) not the actual per-candidate elapsed. The net effect: the fill loop either over-fills (replay overruns, losing candidates) or the wall-clock deadline binds first (under-filling). Either way, fewer scored candidates than v16.
+
 ---
 
 ## Absolute Rules (Derived from Failures)
