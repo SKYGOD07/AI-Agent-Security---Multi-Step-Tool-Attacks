@@ -231,7 +231,7 @@ body { background: var(--bg-app); color: var(--text-light); font-family: var(--f
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.execution-header-info {
+.execution-info {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -250,13 +250,13 @@ body { background: var(--bg-app); color: var(--text-light); font-family: var(--f
 .status-dot.running { background: #f59e0b; }
 .status-dot.pending { background: #6b7280; }
 
-.execution-header-info h4 {
+.execution-info h4 {
   margin: 0;
   font-size: 1rem;
   color: var(--text-light);
 }
 
-.execution-header-info p {
+.execution-info p {
   margin: 0.25rem 0 0 0;
   font-size: 0.85rem;
   color: var(--text-muted);
