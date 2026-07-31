@@ -30,6 +30,11 @@ export default function App() {
   const [chatting, setChatting] = useState(false);
   const chatEndRef = useRef(null);
   
+  // Execution state
+  const [executions, setExecutions] = useState([]);
+  const [executionsLoading, setExecutionsLoading] = useState(false);
+  const [executionFilter, setExecutionFilter] = useState('all');
+  
   const dragRef = useRef(null);
   const canvasRef = useRef(null);
   const fileRef = useRef(null);
@@ -172,6 +177,80 @@ export default function App() {
   useEffect(() => {
     if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
+
+  // Execution handlers
+  const loadExecutions = async () => {
+    setExecutionsLoading(true);
+    try {
+      const res = await fetch(`${API}/api/executions`);
+      const data = await res.json();
+      if (data.executions) {
+        setExecutions(data.executions);
+      }
+    } catch (err) {
+      console.error('Failed to load executions:', err);
+      showToast("Failed to load execution history");
+    } finally {
+      setExecutionsLoading(false);
+    }
+  };
+
+  const handleRefreshExecutions = () => {
+    loadExecutions();
+    showToast("Refreshing execution history...");
+  };
+
+  const handleClearExecutions = async () => {
+    if (window.confirm("Are you sure you want to clear all execution history?")) {
+      try {
+        await fetch(`${API}/api/executions/clear`, { method: 'POST' });
+        setExecutions([]);
+        showToast("Execution history cleared");
+      } catch (err) {
+        console.error('Failed to clear executions:', err);
+        showToast("Failed to clear execution history");
+      }
+    }
+  };
+
+  const viewExecutionDetails = (id) => {
+    const execution = executions.find(e => e.id === id);
+    if (execution) {
+      // In a real app, this might open a modal or sidebar with detailed info
+      alert(`Execution Details:\nName: ${execution.name}\nStatus: ${execution.status}\nStart Time: ${new execution.startTime}\nDuration: ${execution.duration}ms\n\nLogs:\n${execution.logs || 'No logs available'}`);
+    }
+  };
+
+  const rerunExecution = async (id) => {
+    const execution = executions.find(e => e.id === id);
+    if (execution) {
+      showToast(`Re-executing: ${execution.name || 'Unnamed'}`);
+      try {
+        const res = await fetch(`${API}/api/executions/${id}/rerun`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Execution restarted successfully");
+          // Refresh executions list to show updated status
+          setTimeout(loadExecutions, 2000);
+        } else {
+          throw new Error(data.error || 'Failed to restart execution');
+        }
+      } catch (err) {
+        console.error('Failed to rerun execution:', err);
+        showToast("Failed to restart execution");
+      }
+    }
+  };
+
+  // Load executions on component mount and when project changes
+  useEffect(() => {
+    if (project) {
+      loadExecutions();
+      // Set up polling for real-time updates (optional)
+      const interval = setInterval(loadExecutions, 10000); // Poll every 10 seconds
+      return () => clearInterval(interval);
+    }
+  }, [project]);
 
   const sendChatMessage = async (e) => {
     e.preventDefault();
@@ -405,7 +484,67 @@ export default function App() {
           <div className="tab-content">
             <div className="card">
               <h3>Execution History</h3>
-              <p style={{ color: 'var(--text-muted)' }}>Graph and roadmap execution logs will appear here based on project history.</p>
+              <div className="executions-toolbar">
+                <button className="btn btn-sm" onClick={handleRefreshExecutions}>
+                  <span className="icon">🔄</span> Refresh
+                </button>
+                <button className="btn btn-sm" onClick={handleClearExecutions}>
+                  <span className="icon">🗑️</span> Clear
+                </button>
+                <select className="select" value={executionFilter} onChange={e => setExecutionFilter(e.target.value)}>
+                  <option value="all">All Executions</option>
+                  <option value="successful">Successful</option>
+                  <option value="failed">Failed</option>
+                  <option value="running">Running</option>
+                </select>
+              </div>
+              {executionsLoading ? (
+                <div className="loader">Loading execution history...</div>
+              ) : executions.length === 0 ? (
+                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
+                  No executions recorded yet. Run workflows to see execution history here.
+                </p>
+              ) : (
+                <div className="executions-list">
+                  {executions.map(execution => (
+                    <div key={execution.id} className="execution-item">
+                      <div className="execution-header">
+                        <div className="execution-info">
+                          <h4>{execution.name || 'Unnamed Execution'}</h4>
+                          <p className="execution-meta">
+                            <span className={`status-dot ${execution.status}`}></span>
+                            {execution.status.charAt(0).toUpperCase() + execution.status.slice(1)}
+                            <span className="execution-time">{new Date(execution.timestamp).toLocaleTimeString()}</span>
+                          </p>
+                        </div>
+                        <div className="execution-actions">
+                          <button className="btn btn-sm" onClick={() => viewExecutionDetails(execution.id)}>
+                            <span className="icon">👁️</span> View
+                          </button>
+                          <button className="btn btn-sm" onClick={() => rerunExecution(execution.id)}>
+                            <span className="icon">🔄</span> Rerun
+                          </button>
+                        </div>
+                      </div>
+                      {(execution.error || execution.logs) && (
+                        <div className="execution-details">
+                          {execution.error && (
+                            <div className="execution-error">
+                              <strong>Error:</strong> {execution.error}
+                            </div>
+                          )}
+                          {execution.logs && (
+                            <div className="execution-logs">
+                              <strong>Logs:</strong>
+                              <pre className="log-pre">{execution.logs}</pre>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
