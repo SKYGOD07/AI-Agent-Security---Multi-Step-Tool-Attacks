@@ -553,12 +553,88 @@ export default function App() {
           <div className="tab-content">
             <div className="card">
               <h3>Project Context</h3>
-              <p style={{ color: 'var(--text-muted)' }}>Workspace: <strong>{project}</strong></p>
-              <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={async () => {
-                 const res = await fetch(`${API}/api/writeup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ context: "Full context" }) });
-                 const data = await res.json();
-                 alert("Generated Writeup:\n" + data.writeup);
-              }}>Generate Kaggle Writeup</button>
+              {contextLoading ? (
+                <div className="loader">Loading context...</div>
+              ) : !context ? (
+                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
+                  No active project. Create or select a project to view context.
+                </p>
+              ) : (
+                <>
+                  <div className="context-info">
+                    <div className="info-row">
+                      <span className="info-label">Project Name:</span>
+                      <span className="info-value">{context.name}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Created:</span>
+                      <span className="info-value">{context.createdAt ? new Date(context.createdAt).toLocaleString() : 'Unknown'}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Last Active:</span>
+                      <span className="info-value">{context.updatedAt ? new Date(context.updatedAt).toLocaleString() : 'Unknown'}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Description:</span>
+                      <span className="info-value">{context.description || 'No description provided'}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="context-section">
+                    <h4>Environment Variables</span>
+                    <div className="env-vars">
+                      {environmentVars.length > 0 ? (
+                        environmentVars.map((env, index) => (
+                          <div key={index} className="env-var">
+                            <span className="env-name">{env.key}</span>
+                            <span className="env-value">{env.value}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ color: 'var(--text-muted)' }}>No environment variables configured.</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="context-section">
+                    <h4>Recent Activity</span>
+                    <div className="activity-timeline">
+                      {recentActivity.length > 0 ? (
+                        recentActivity.map((activity, index) => (
+                          <div key={index} className="activity-item">
+                            <div className="activity-icon">
+                              <span className={`activity-type-${activity.type}`}>{activity.icon}</span>
+                            </div>
+                            <div className="activity-content">
+                              <h5>{activity.title}</h5>
+                              <p>{activity.description}</p>
+                              <span className="activity-time">{new Date(activity.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ color: 'var(--text-muted)' }}>No recent activity.</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="context-actions">
+                    <button className="btn btn-outline" onClick={handleRefreshContext}>
+                      <span className="icon">🔄</span> Refresh Context
+                    </button>
+                    <button className="btn btn-primary" onClick={handleExportContext}>
+                      <span className="icon">📥</span> Export Configuration
+                    </button>
+                    <button className="btn btn-primary" onClick={() => {
+                       const res = await fetch(`${API}/api/writeup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ context: "Full context" }) });
+                       const data = await res.json();
+                       alert("Generated Writeup:\n" + data.writeup);
+                    }}>
+                      <span className="icon">📝</span> Generate Kaggle Writeup
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
