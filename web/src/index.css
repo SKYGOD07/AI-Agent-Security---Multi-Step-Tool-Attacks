@@ -262,6 +262,15 @@ body { background: var(--bg-app); color: var(--text-light); font-family: var(--f
   color: var(--text-muted);
 }
 
+.execution-meta {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .execution-actions {
   display: flex;
   gap: 0.5rem;
