@@ -18,6 +18,9 @@
 ## v23: Scored 53.190 (regression from 87.660)
 **Root cause**: `PROBE_HOPS=1` with `REPLAY_COST_COEF=2.0` miscalibrated the fill loop's stop condition. The `_replay_stop()` function estimates the next candidate's cost as `slowest * SLOWEST_MULT * replay_cost_coef`, but with hops-1 probing, `slowest` stays artificially low (~half of hops=8). The 2× coefficient doesn't compensate correctly because the stop condition uses `slowest * SLOWEST_MULT` (the cushion estimate) not the actual per-candidate elapsed. The net effect: the fill loop either over-fills (replay overruns, losing candidates) or the wall-clock deadline binds first (under-filling). Either way, fewer scored candidates than v16.
 
+## v25: Submission Format Error
+**Root cause**: v25 failed because it increased per-candidate replay cost by packing two URLs into each template without recalibrating replay-safe sizing. Do not change the notebook wrapper when the failure is replay-budget related. Preserve the verified Id,Score output path, keep only candidates that fired in live validation, and size the returned portfolio by measured replay cost, not by search-time budget. Never add denser templates or static padding unless the replay cap is re-estimated from the actual candidate shape.
+
 ---
 
 ## Absolute Rules (Derived from Failures)
