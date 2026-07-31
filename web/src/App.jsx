@@ -35,6 +35,12 @@ export default function App() {
   const [executionsLoading, setExecutionsLoading] = useState(false);
   const [executionFilter, setExecutionFilter] = useState('all');
   
+  // Context state
+  const [context, setContext] = useState(null);
+  const [contextLoading, setContextLoading] = useState(false);
+  const [environmentVars, setEnvironmentVars] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  
   const dragRef = useRef(null);
   const canvasRef = useRef(null);
   const fileRef = useRef(null);
@@ -246,11 +252,57 @@ export default function App() {
   useEffect(() => {
     if (project) {
       loadExecutions();
+      loadContext();
       // Set up polling for real-time updates (optional)
-      const interval = setInterval(loadExecutions, 10000); // Poll every 10 seconds
+      const interval = setInterval(() => {
+        loadExecutions();
+        loadContext();
+      }, 10000); // Poll every 10 seconds
       return () => clearInterval(interval);
     }
   }, [project]);
+
+  // Context functions
+  const loadContext = async () => {
+    setContextLoading(true);
+    try {
+      const res = await fetch(`${API}/api/context`);
+      const data = await res.json();
+      if (data) {
+        setContext(data.context);
+        setEnvironmentVars(data.environmentVariables || []);
+        setRecentActivity(data.recentActivity || []);
+      }
+    } catch (err) {
+      console.error('Failed to load context:', err);
+      showToast("Failed to load context information");
+    } finally {
+      setContextLoading(false);
+    }
+  };
+
+  const handleRefreshContext = () => {
+    loadContext();
+    showToast("Refreshing context...");
+  };
+
+  const handleExportContext = async () => {
+    try {
+      const res = await fetch(`${API}/api/context/export`, { method: 'GET' });
+      const data = await res.blob();
+      const url = window.URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'context-config.json';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      showToast("Context exported successfully");
+    } catch (err) {
+      console.error('Failed to export context:', err);
+      showToast("Failed to export context");
+    }
+  };
 
   const sendChatMessage = async (e) => {
     e.preventDefault();
