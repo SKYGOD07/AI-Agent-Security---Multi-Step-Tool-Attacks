@@ -15,7 +15,7 @@
   --pin-exec: #333333;
   --pin-data: #ff6d5a;
   --shadow-node: 0 4px 14px rgba(0,0,0,0.4);
-  
+
   --font-ui: 'Open Sans', sans-serif;
   --font-mono: 'Fira Code', monospace;
 }
@@ -50,6 +50,8 @@ body { background: var(--bg-app); color: var(--text-light); font-family: var(--f
 .btn:hover { background: #333; }
 .btn-primary { background: var(--accent-primary); color: #fff; border: none; }
 .btn-primary:hover { background: #ff523b; }
+.btn-outline { background: transparent; border: 1px solid var(--border-subtle); color: var(--text-light); }
+.btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-primary); color: var(--accent-primary); }
 
 /* ─── Layout ─── */
 .main-area { display: flex; flex: 1; overflow: hidden; position: relative; }
@@ -168,3 +170,308 @@ body { background: var(--bg-app); color: var(--text-light); font-family: var(--f
 .chat-input-wrapper input { flex: 1; background: transparent; border: none; color: var(--text-light); font-size: 0.95rem; outline: none; }
 .chat-input-wrapper button { background: var(--accent-primary); border: none; width: 36px; height: 36px; border-radius: 50%; color: #fff; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .chat-input-wrapper button:hover { transform: scale(1.05); }
+
+/* ─── Executions Tab ─── */
+.executions-toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.executions-toolbar button,
+.executions-toolbar select {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  color: var(--text-light);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.executions-toolbar button:hover {
+  background: #333;
+}
+
+.executions-toolbar button.btn-primary {
+  background: var(--accent-primary);
+  color: #fff;
+  border: none;
+}
+
+.executions-toolbar button.btn-primary:hover {
+  background: #ff523b;
+}
+
+.executions-toolbar select {
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.executions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.execution-item {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.execution-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.execution-header-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-dot.success { background: #22c55e; }
+.status-dot.error { background: #ef4444; }
+.status-dot.running { background: #f59e0b; }
+.status-dot.pending { background: #6b7280; }
+
+.execution-header-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+.execution-header-info p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.execution-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.execution-details {
+  padding: 1.5rem;
+  background: var(--bg-app);
+}
+
+.execution-details h5 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--accent-secondary);
+  font-size: 1rem;
+}
+
+.execution-details pre {
+  background: var(--bg-node);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.loader::after {
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-top: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Context Tab ─── */
+.section-container {
+  margin-bottom: 2rem;
+}
+
+.section-container h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--accent-secondary);
+  font-size: 1.25rem;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.info-label {
+  flex: 0 0 120px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.info-value {
+  flex: 1;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.context-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.context-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--accent-secondary);
+  font-size: 1.1rem;
+}
+
+.env-vars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.env-var {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: var(--bg-app);
+  border-radius: 4px;
+}
+
+.env-name {
+  font-weight: 600;
+  color: var(--accent-secondary);
+}
+
+.env-value {
+  font-family: var(--font-mono);
+  color: var(--text-light);
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.activity-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.activity-content {
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.activity-content h5 {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+
+.activity-content p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.activity-time {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.context-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* ─── Responsive Adjustments ─── */
+@media (max-width: 768px) {
+  .executions-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .executions-toolbar button,
+  .executions-toolbar select {
+    width: 100%;
+  }
+
+  .execution-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .execution-actions {
+    align-self: flex-end;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .info-label {
+    flex: none;
+    width: 100%;
+  }
+
+  .context-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .context-actions button {
+    width: 100%;
+  }
+}
