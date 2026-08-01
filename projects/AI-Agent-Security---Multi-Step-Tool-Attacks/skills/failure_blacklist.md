@@ -21,6 +21,12 @@
 ## v25: Submission Format Error
 **Root cause**: v25 failed because it increased per-candidate replay cost by packing two URLs into each template without recalibrating replay-safe sizing. Do not change the notebook wrapper when the failure is replay-budget related. Preserve the verified Id,Score output path, keep only candidates that fired in live validation, and size the returned portfolio by measured replay cost, not by search-time budget. Never add denser templates or static padding unless the replay cap is re-estimated from the actual candidate shape.
 
+## v26: Scored 57.210 (regression from 84.645)
+**Root cause**: `REPLAY_SAFE=0.92` + `REPLAY_COST_COEF=1.15` was too conservative. The dual-URL templates also reduced fire-rate (model often failed to execute both http.post calls). Combined effect: far fewer scored candidates than v24's single-URL approach. The dual-URL template experiment is a dead end — it doubles replay cost per candidate while reducing fire-rate.
+
+## v27: Submission Format Error
+**Root cause**: Three compounding bugs: (1) Fragile direct imports (`from aicomp_sdk.attacks.contracts import ...` and `from aicomp_sdk.core.env.api import AttackEnvProtocol`) crashed when the SDK path differed on Kaggle rerun. (2) No defensive `__init__` — if base class doesn't set `self.config` as dict, every `self.config.get()` call crashes. (3) Over-tightened margins (`MARGIN_S=42 + FILL_BUDGET_FRAC=0.97 + MARGIN_FLOOR_MIN=3.0`) all at once could overshoot replay budget. Fix: use jedforce-1's defensive try/except imports, defensive `__init__`, base64 encoding, always-serve pattern, and moderate (not aggressive) margin tuning.
+
 ---
 
 ## Absolute Rules (Derived from Failures)
