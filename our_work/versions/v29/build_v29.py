@@ -2,9 +2,16 @@
 
 import base64
 import json
+from pathlib import Path
+
+DIR = Path(__file__).resolve().parent
+# DIR is C:\OPENAI AI AGENT CYBERSEC\our_work\versions\v29
+# PROJECT_ROOT is C:\OPENAI AI AGENT CYBERSEC
+PROJECT_ROOT = DIR.parents[2]
 
 # ---- Load the decoded attack.py ----
-with open("our_work/jed_attack_decoded_v29.py", "r", encoding="utf-8") as f:
+attack_script_path = DIR / "jed_attack_decoded_v29.py"
+with open(attack_script_path, "r", encoding="utf-8") as f:
     attack_py = f.read()
 
 attack_b64 = base64.b64encode(attack_py.encode("utf-8")).decode("ascii")
@@ -81,7 +88,7 @@ nb = {
     "nbformat_minor": 5,
 }
 
-output_path = "our_work/notebooks/stockfish_v29_attack.ipynb"
+output_path = PROJECT_ROOT / "our_work" / "notebooks" / "stockfish_v29_attack.ipynb"
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(nb, f, indent=1)
 
