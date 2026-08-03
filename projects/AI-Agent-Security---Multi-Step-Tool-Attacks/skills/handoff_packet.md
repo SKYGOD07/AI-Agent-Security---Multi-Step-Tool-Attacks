@@ -1,10 +1,10 @@
-# Handoff Packet: The baseline v16 strategy
-v19 and v20 failed because they introduced static/unverified diversity padding on top of the proven v16 replay-throughput baseline. This padding increased candidate count without verified fire rates, diluted the replay budget, and caused Replay Timeout / Submission Format Errors. 
+# Handoff Packet: Red-Team AI Agent Security Engine
 
-**Moving forward to v21 and beyond:**
-We must stick to the v16 working baseline behavior. This means:
-1. Minimal notebook wrapper.
-2. Correct Id,Score placeholder on commit.
-3. Rerun gating.
-4. Only replay-safe, verified candidates in the returned portfolio.
-5. **ABSOLUTELY NO UNVERIFIED STATIC PADDING.**
+> **IMPORTANT**: The primary, comprehensive, 1000+ line handoff thesis for this repository is located at:
+> 
+> 📄 **[MASTER_AI_HANDOFF_THESIS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/MASTER_AI_HANDOFF_THESIS.md)**
+
+## Quick Handoff Summary
+- **Current Version**: `stockfish_v29_attack.ipynb` (Decoded from `ai-agent-security-90.ipynb`, **Public Score Target: 90.090+**)
+- **Key Mechanics**: Asymmetric Dual-Track Multi-Post Routing (`SLOW_MULTIPOST_N = 4` for `gpt_oss` via token forging, `BURST_K = 2` for `gemma`).
+- **Scaffolding**: Base64 attack script encoding + defensive `try/except` imports + defensive `__init__` (Zero Format Error Guarantee).
