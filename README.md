@@ -20,8 +20,8 @@ Additional documentation:
 
 ## 🚀 Active Version: v29 (`stockfish_v29_attack.ipynb`)
 - **Target Score**: **90.090+**
-- **Decoded Source**: `our_work/jed_attack_decoded_v29.py`
-- **Build Script**: `our_work/build_v29.py`
+- **Decoded Source**: `our_work/versions/v29/jed_attack_decoded_v29.py`
+- **Build Script**: `our_work/versions/v29/build_v29.py`
 - **Key Breakthrough**: Asymmetric Dual-Track Multi-Post Routing
   - `SLOW_MULTIPOST_N = 4` for `gpt_oss` via token-forged analysis channels (**72 raw points / candidate**).
   - `BURST_K = 2` for `gemma` via burst imperative formatting (**36 raw points / candidate**).
@@ -32,6 +32,6 @@ Additional documentation:
 ## 🛠️ How to Build and Submit
 To generate and build notebook `v29`:
 ```bash
-python our_work/build_v29.py
+python our_work/versions/v29/build_v29.py
 ```
 This produces `our_work/notebooks/stockfish_v29_attack.ipynb`. Submit to Kaggle with **GPU T4 x2** and **Internet Off**.
