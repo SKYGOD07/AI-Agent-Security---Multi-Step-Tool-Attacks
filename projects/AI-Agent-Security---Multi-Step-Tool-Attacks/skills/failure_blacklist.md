@@ -27,6 +27,9 @@
 ## v27: Submission Format Error
 **Root cause**: Three compounding bugs: (1) Fragile direct imports (`from aicomp_sdk.attacks.contracts import ...` and `from aicomp_sdk.core.env.api import AttackEnvProtocol`) crashed when the SDK path differed on Kaggle rerun. (2) No defensive `__init__` — if base class doesn't set `self.config` as dict, every `self.config.get()` call crashes. (3) Over-tightened margins (`MARGIN_S=42 + FILL_BUDGET_FRAC=0.97 + MARGIN_FLOOR_MIN=3.0`) all at once could overshoot replay budget. Fix: use jedforce-1's defensive try/except imports, defensive `__init__`, base64 encoding, always-serve pattern, and moderate (not aggressive) margin tuning.
 
+## v28: Scored 85.590 (regression from 90.09)
+**Root cause**: `v28` set `BURST_K = 1` and `SLOW_MULTIPOST_N = 1`, restricting candidates to a single `http.post` call (max 18 raw points per candidate). In contrast, `ai-agent-security-90.ipynb` (which scored **90.09**) sets `SLOW_MULTIPOST_N = 4` for `gpt_oss` (via token forging) and `BURST_K = 2` for `gemma` (via burst formatting). This delivers **4x points per candidate on gpt_oss** (72 raw points) and **2x points per candidate on gemma** (36 raw points) without triggering replay format errors!
+
 ---
 
 ## Absolute Rules (Derived from Failures)
