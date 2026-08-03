@@ -288,24 +288,19 @@ c:\OPENAI AI AGENT CYBERSEC\
 ├── ANALYSIS_REPORT.md                <-- High-level executive summary & analysis
 ├── README.md                         <-- Repository documentation & usage
 ├── our_work/
-│   ├── build_v29.py                  <-- Build script for v29 (Base64 encoder)
-│   ├── build_v28.py                  <-- Build script for v28
-│   ├── build_v27.py                  <-- Build script for v27
-│   ├── build_v26.py                  <-- Build script for v26
-│   ├── build_v25.py                  <-- Build script for v25
-│   ├── build_v24.py                  <-- Build script for v24
-│   ├── build_v23.py                  <-- Build script for v23
-│   ├── jed_attack_decoded_v29.py     <-- Decoded source for v29 (90.090 architecture)
-│   ├── jed_attack_decoded_v28.py     <-- Decoded source for v28 (85.590 score)
-│   ├── jed_attack_decoded_v27.py     <-- Decoded source for v27
-│   ├── jed_attack_decoded_v26.py     <-- Decoded source for v26
-│   ├── jed_attack_decoded_v25.py     <-- Decoded source for v25
-│   ├── jed_attack_decoded_v24.py     <-- Decoded source for v24
-│   ├── notebooks/                    <-- Generated submission notebooks
+│   ├── attack.py                     # Current default attack script
+│   ├── notebooks/                    # Generated submission notebooks (v11 through v29)
 │   │   ├── stockfish_v29_attack.ipynb
 │   │   ├── stockfish_v28_attack.ipynb
-│   │   ├── stockfish_v27_attack.ipynb
 │   │   └── ...
+│   ├── versions/                     # Clean versioned source and build scripts
+│   │   ├── v23/                      # build_v23.py
+│   │   ├── v24/                      # build_v24.py, jed_attack_decoded_v24.py
+│   │   ├── v25/                      # build_v25.py, jed_attack_decoded_v25.py
+│   │   ├── v26/                      # build_v26.py, jed_attack_decoded_v26.py
+│   │   ├── v27/                      # build_v27.py, jed_attack_decoded_v27.py
+│   │   ├── v28/                      # build_v28.py, jed_attack_decoded_v28.py
+│   │   └── v29/                      # build_v29.py, jed_attack_decoded_v29.py
 │   ├── older attacks/                <-- Benchmark reference notebooks
 │   │   ├── ai-agent-security-90.ipynb (Score: 90.090)
 │   │   ├── ai-agent-security-v69.ipynb (Score: 88.200)
