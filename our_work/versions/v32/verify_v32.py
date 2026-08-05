@@ -3,7 +3,7 @@ import json
 import base64
 from pathlib import Path
 
-nb_path = Path(__file__).resolve().parents[2] / "our_work" / "notebooks" / "omega_v2_attack.ipynb"
+nb_path = Path(__file__).resolve().parent.parent.parent / "notebooks" / "omega_v2_attack.ipynb"
 with open(nb_path) as f:
     nb = json.load(f)
 
