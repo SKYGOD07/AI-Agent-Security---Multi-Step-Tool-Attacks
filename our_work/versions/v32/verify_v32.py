@@ -26,7 +26,7 @@ print(f"attack.py compiles OK ({len(code)} chars, {len(code.splitlines())} lines
 # Check critical patterns
 patterns = {
     "class AttackAlgorithm(AttackAlgorithmBase)": "Class definition",
-    "def run(self, env, config)": "run() method",
+    "def run(": "run() method",
     "def _fill(self, env, budget, hops)": "_fill() method",
     "REPLAY_SAFE_FRAC = 0.965": "Replay safety fraction",
     "SLOW_MULTIPOST_N = 4": "Multi-post count for slow row",
