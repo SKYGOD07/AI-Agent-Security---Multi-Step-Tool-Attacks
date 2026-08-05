@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = DIR.parents[1]  # our_work/versions/v32 -> root
+PROJECT_ROOT = DIR.parents[2]  # our_work/versions/v32 -> root
 
 # Read attack source
 attack_src = (DIR / "omega_v2_attack.py").read_text(encoding="utf-8")
