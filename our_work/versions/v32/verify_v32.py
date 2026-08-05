@@ -27,7 +27,7 @@ print(f"attack.py compiles OK ({len(code)} chars, {len(code.splitlines())} lines
 patterns = {
     "class AttackAlgorithm(AttackAlgorithmBase)": "Class definition",
     "def run(": "run() method",
-    "def _fill(self, env, budget, hops)": "_fill() method",
+    "def _fill(": "_fill() method",
     "REPLAY_SAFE_FRAC = 0.965": "Replay safety fraction",
     "SLOW_MULTIPOST_N = 4": "Multi-post count for slow row",
     "BURST_K = 1": "Single post for fast row",
