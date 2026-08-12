@@ -147,9 +147,11 @@ for pattern, desc in [
 
 # Verify NO v7 multi-predicate artifacts
 print(f"\n--- v7 Regression Safeguards ---")
-# Check no multi-predicate VARIABLES exist (docstring mentions are OK)
-code_lines = [l for l in decoded.split("\n") if not l.strip().startswith("#") and not l.strip().startswith('"') and not l.strip().startswith("'")]
-code_only = "\n".join(code_lines)
+# Strip docstrings and comments, then check no multi-predicate CODE exists
+import re
+code_only = re.sub(r'"""[\s\S]*?"""', '', decoded)
+code_only = re.sub(r"'''[\s\S]*?'''", '', code_only)
+code_only = "\n".join(l for l in code_only.split("\n") if not l.strip().startswith("#"))
 assert "MULTI_TEMPLATE" not in code_only
 print("[OK] No MULTI_TEMPLATE variable (v7 regression cause)")
 assert "fs.delete" not in code_only
