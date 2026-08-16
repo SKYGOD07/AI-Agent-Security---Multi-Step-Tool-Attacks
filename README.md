@@ -6,32 +6,33 @@ This repository contains the full research, engineering, and submission pipeline
 ---
 
 ## 📄 Master Handoff Thesis & Documentation
-If you are an AI model (e.g., NVIDIA models running in Claude Code via Ollama) or developer taking over this workspace, read the comprehensive 1000+ line handoff thesis:
+If you are an AI model or developer taking over this workspace, read the comprehensive handoff documentation:
 
-👉 **[MASTER_AI_HANDOFF_THESIS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/MASTER_AI_HANDOFF_THESIS.md)**
-
-Additional documentation:
-- 📊 **[ANALYSIS_REPORT.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/ANALYSIS_REPORT.md)**: Executive research overview & score progression.
-- 📐 **[docs/SCORING_AND_EVALUATION.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/docs/SCORING_AND_EVALUATION.md)**: Mathematical scoring specification.
-- 📚 **[docs/notebook_algorithms/COMPREHENSIVE_NOTEBOOK_CATALOG.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/docs/notebook_algorithms/COMPREHENSIVE_NOTEBOOK_CATALOG.md)**: Catalog of all notebook versions (v11 through v29).
+- 🏆 **[FAILURES_AND_LESSONS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/FAILURES_AND_LESSONS.md)**: Master OMEGA Series post-mortem & failure guide.
+- 📚 **[our_work/docs/failure_analysis_and_knowledge_base.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/our_work/docs/failure_analysis_and_knowledge_base.md)**: Complete version progression & failure taxonomy (v4–v43).
 - 🛑 **[projects/AI-Agent-Security---Multi-Step-Tool-Attacks/skills/failure_blacklist.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/projects/AI-Agent-Security---Multi-Step-Tool-Attacks/skills/failure_blacklist.md)**: Failure post-mortems and mandatory rules.
+- 📐 **[docs/SCORING_AND_EVALUATION.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/docs/SCORING_AND_EVALUATION.md)**: Mathematical scoring specification.
 
 ---
 
-## 🚀 Active Version: v29 (`stockfish_v29_attack.ipynb`)
-- **Target Score**: **90.090+**
-- **Decoded Source**: `our_work/versions/v29/jed_attack_decoded_v29.py`
-- **Build Script**: `our_work/versions/v29/build_v29.py`
-- **Key Breakthrough**: Asymmetric Dual-Track Multi-Post Routing
-  - `SLOW_MULTIPOST_N = 4` for `gpt_oss` via token-forged analysis channels (**72 raw points / candidate**).
-  - `BURST_K = 2` for `gemma` via burst imperative formatting (**36 raw points / candidate**).
-- **Protection**: Base64 encoding + defensive import cascades + defensive `__init__` (Zero Format Errors).
+## 🚀 Active Version: v43 (`omega_v13_attack.ipynb`)
+- **Peak Score Benchmark**: **89.955** (v11)
+- **Target Score**: **90.600+** (v13 Incremental Goal Edition)
+- **Source Code**: `our_work/versions/v43/omega_v13_attack.py`
+- **Build Script**: `our_work/versions/v43/build_v43.py`
+- **Strategy Specs**: `our_work/versions/v43/v43_strategy.md`
+- **Key Breakthrough**: High-Precision Latency-Split Single-Post Fill
+  - `REPLAY_SAFE_FRAC = 0.994` (8946s replay cap $\rightarrow$ reclaims +27s of budget).
+  - `SLOWEST_MULT = 1.10` (tightens end-of-fill cushion $\rightarrow$ +1.5 candidates).
+  - `SPLIT_CLASSIFY_N = 1` (saves 1 classification cycle $\rightarrow$ +1.5 candidates).
+  - `SLOWEST0 = 12.0` (tighter initial latency seed $\rightarrow$ +1.0 candidate).
+- **Protection**: Base64 encoding + defensive import cascades + defensive `__init__` + 0% timeout risk.
 
 ---
 
 ## 🛠️ How to Build and Submit
-To generate and build notebook `v29`:
+To generate and build notebook `v43`:
 ```bash
-python our_work/versions/v29/build_v29.py
+python our_work/versions/v43/build_v43.py
 ```
-This produces `our_work/notebooks/stockfish_v29_attack.ipynb`. Submit to Kaggle with **GPU T4 x2** and **Internet Off**.
+This produces `our_work/notebooks/omega_v13_attack.ipynb`. Submit to Kaggle with **GPU T4 x2** and **Internet Off**.

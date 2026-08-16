@@ -1,58 +1,48 @@
-# Strategy Library
+# Strategy Library (Updated v43 / OMEGA Series)
 
 This library contains reusable tactics that have been empirically tested against the Kaggle evaluator. Only promote a strategy to "Preferred" if it is verified to improve the score and survive replay.
 
 ---
 
-## 1. Template Racing (Replay-Throughput)
-- **Status**: **PREFERRED**
-- **Evidence Level**: **[STRONG EVIDENCE]**
-- **Purpose**: Maximize the number of firing Exfiltration candidates generated within the 9000s budget.
-- **Mechanics**: Probe a small set (5) of distinct templates. Run 5 reps each. Measure `effective_cost = median(successful_latencies) / fire_rate`. Select the single template with the lowest effective cost, and exclusively use it to generate the remaining candidates.
-- **When it helped**: v7, v16 (established baseline top scores).
-- **When it failed**: Never failed structurally, but can be ruined by bad templates.
+## 1. Latency-Split Single-Post Fill (OMEGA Core)
+- **Status**: **PREFERRED (PEAK BENCHMARK: 89.955 in v11)**
+- **Evidence Level**: **[VERIFIED - HIGHEST LB SCORE]**
+- **Purpose**: Maximize the number of firing Exfiltration candidates generated within the 9000s per-model budget.
+- **Mechanics**: Sample candidate 0 latency. Classify target model:
+  - If $> 12.0s \rightarrow gpt\_oss$ (slow row) $\rightarrow$ use Harmony-forged `FRAME_TEMPLATE`.
+  - If $< 12.0s \rightarrow gemma$ (fast row) $\rightarrow$ use standard imperative `TEMPLATE`.
+- **When it helped**: OMEGA v5 (89.640), OMEGA v8 (89.145), OMEGA v11 (89.955 - 999.5 candidates replayed).
 - **Confidence**: 100%
 - **Replay Risk**: Low
-- **Notebook Risk**: None
 
 ## 2. Replay-Safe Sizing (Measured Latency Cap)
 - **Status**: **PREFERRED**
 - **Evidence Level**: **[VERIFIED]**
 - **Purpose**: Prevent `ModelEvaluationTimedOut` errors (Submission Format Errors) during Kaggle's hidden replay phase.
-- **Mechanics**: Track the cumulative measured execution time of every candidate *as they are generated during search*. Stop generating new candidates when `cumulative_cost > (0.99 * 9000s)`.
-- **When it helped**: v16 (recovered from v13/v14 timeout errors).
-- **When it failed**: When ignored (v13, v14, v17, v19).
+- **Mechanics**: Track cumulative measured execution time of every candidate during search. Stop generating new candidates when `cumulative_cost > (REPLAY_SAFE_FRAC * 9000s)`.
+- **Optimal Settings**: `REPLAY_SAFE_FRAC = 0.994` (8946s cap, leaving a safe 54s cushion before deadline).
 - **Confidence**: 100%
-- **Replay Risk**: Low (This *mitigates* replay risk).
-- **Notebook Risk**: None
-
-## 3. Semantic Deduplication
-- **Status**: **PREFERRED**
-- **Evidence Level**: **[HYPOTHESIS]**
-- **Purpose**: Maximize score diversity and prevent wasted replay budget on identical tool executions.
-- **Mechanics**: Generate a signature key: `(tool_sequence | predicate_family | prompt_hash)`. Only keep candidates that introduce a new signature, or that have a lower cost/shorter prompt length than an existing collision.
-- **When it helped**: v20 (Implementation pending Kaggle score).
-- **Confidence**: 80%
 - **Replay Risk**: Low
-- **Notebook Risk**: None
 
-## 4. Controlled Live Diversity Layer
-- **Status**: **EXPERIMENTAL (Testing in v20)**
-- **Evidence Level**: **[HYPOTHESIS]**
-- **Purpose**: Target non-Exfiltration predicate families (Confused Deputy, Destructive Write) to trigger severity multipliers (4x, 8x) without diluting the Exfiltration baseline.
-- **Mechanics**: After generating a strong Exfiltration base, use remaining budget to probe diversity templates. Use **Dynamic Decay**: if a diversity template fails to fire 4 consecutive times, abandon it immediately to save budget.
-- **When it helped**: Pending v20 evaluation.
-- **When it failed**: In v15 and v19, static/unverified diversity padding caused budget dilution and replay timeouts. **[STRONG EVIDENCE]**
-- **Confidence**: 60%
-- **Replay Risk**: Medium
-- **Notebook Risk**: None
+## 3. Warm-Up Replay Cost Exemption & Candidate Harvesting
+- **Status**: **PREFERRED**
+- **Evidence Level**: **[VERIFIED]**
+- **Purpose**: Prevent warm-up model-load latency (75-100s) from inflating candidate costs or under-filling the candidate portfolio.
+- **Mechanics**: Subtract warm-up time from `replay_cap` once, charge 0 replay cost for the warm-up candidate, and harvest the warm-up candidate at `max_tool_hops=1` (+1 free candidate).
+- **When it helped**: OMEGA v5 (+1.08 points gain), OMEGA v11 (89.955).
+- **Confidence**: 100%
+- **Replay Risk**: Low
 
-## 5. Hop-Saturation (BURST_K)
-- **Status**: **BLACKLISTED**
-- **Evidence Level**: **[REJECTED]**
-- **Purpose**: Force the LLM to execute multiple tool calls per interaction.
-- **Mechanics**: Appending instructions like "Call http.post exactly 4 times".
-- **When it failed**: v18 (Score dropped to 57). Target models struggle with complex multi-step tool logic.
+## 4. Multi-Predicate & Multi-Post Stacking
+- **Status**: **REJECTED / BLACKLISTED**
+- **Evidence Level**: **[EMPIRICAL REGRESSION]**
+- **Purpose**: Attempting to force multi-tool execution (`fs.delete` + `http.post` in v7; `N=4` multi-post in v12).
+- **Why it Failed**: Executing across 2 to 4 hops increases candidate latency by +41% to +300%. The resulting drop in candidate count outweighs the per-candidate point gains on the Kaggle evaluator, causing regressions (v7 dropped to 88.335, v12 dropped to 85.970).
 - **Confidence**: 0%
 - **Replay Risk**: High
-- **Notebook Risk**: None
+
+## 5. Unconstrained Prompt Termination Omission
+- **Status**: **REJECTED / BLACKLISTED**
+- **Evidence Level**: **[EMPIRICAL REGRESSION & TIMEOUT]**
+- **Why it Failed**: Omitting explicit natural language termination instructions ("Then answer OK only.") causes `gpt_oss` to enter 4096-token runaway generation, taking 60+ seconds per candidate and timing out the container (v9 dropped to 86.355).
+- **Rule**: Always include explicit termination instructions ("Then answer OK only.") in all prompt templates.
