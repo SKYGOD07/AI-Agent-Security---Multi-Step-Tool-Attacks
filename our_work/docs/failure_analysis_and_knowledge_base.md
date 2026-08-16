@@ -1,79 +1,78 @@
-# Comprehensive Failure Analysis & Knowledge Base (v4 – v19)
+# Comprehensive Failure Analysis & Knowledge Base (v4 – v43 / OMEGA Series)
 
-This document synthesizes every version's design, empirical score, failure mode, and root cause across the competition trajectory. It serves as an authoritative reference for future AI agents and models working on the **AI Agent Security – Multi-Step Tool Attacks** Kaggle benchmark.
+This document synthesizes every version's design, empirical score, failure mode, and root cause across the competition trajectory. It serves as an authoritative reference for future AI agents working on the **AI Agent Security – Multi-Step Tool Attacks** Kaggle benchmark.
 
 ---
 
-## 1. Executive Summary & Version Progression Table
+## 1. Complete Version Progression Table (v4 – v43)
 
-| Version | Public Score | Status / Error Type | Core Architectural Idea | Primary Reason for Score / Failure |
+| Version | Public Score | Status / Outcome | Core Architecture / Focus | Key Lesson / Root Cause |
 | :--- | :---: | :--- | :--- | :--- |
 | **v4** | `78.930` | Succeeded | Basic Stockfish search | Simple single-post prompt, basic candidate generation. |
 | **v5** | `77.895` | Succeeded | Template expansion | Added more prompt templates without latency filtering. |
-| **v7** | **`84.240`** | **Best Core** | **Replay-Throughput Loop** | Linear pipeline: Probe → Select lowest effective cost → Seed fired probes → Fill until budget. |
-| **v8** | `22.290` | Catastrophic Regression | Family Pivot / Heuristic Controller | High controller complexity, bad routing, search state overhead collapsed throughput. |
-| **v9** | `51.990` | Poor | Adaptive Portfolio / Multi-Armed Bandits | Bandit exploration wasted time on low-yield attack families during search. |
-| **v11** | `23.175` | Catastrophic Regression | Two-Track Router | Over-engineered heuristic router & signatures hurt replay throughput. |
-| **v12** | `N/A` | **Notebook Threw Exception** | Search overhaul + local SDK import | Imported `SandboxEnv` & executed `importlib.exec_module` + `AttackAlgorithm()` inside notebook cell prior to evaluator launch. |
-| **v13** | `14.820` | Regression / Format Error | Replay signature archive + heavy search | Overran time budget during search; leftover candidates exceeded replay window. |
-| **v14** | `N/A` | **Submission Format Error** | Base64 inline code + Relay Push100 | Base64 decoding corruption / candidate budget overflowed the 9000s per-model replay cap. |
-| **v15** | `72.270` | Moderate Regression | Multi-Predicate Round-Robin Fill | Filled candidates across Exfiltration, Destructive Write, & Confused Deputy without verifying fire rates, wasting budget on non-firing templates. |
-| **v16** | **`87.660`** | **Succeeded (Best)** | **Disciplined 88.560 Baseline Recovery** | Rebuilt exact 88.560 baseline: 5-cell `%%writefile` notebook, `IS_RERUN` gating, measured latency replay-safe cap. |
-| **v17** | `N/A` | **Submission Format Error** | 89.055 Template Race Port | Base64 / string formatting bug or unhandled exception during fallback execution. |
-| **v18** | `57.285` | Severe Regression | `BURST_K = 4` Hop-Saturation | Forced 4 `http.post` calls per prompt. Target models (Gemma/GPT-OSS) failed to follow multi-post instructions reliably, causing fire rate to collapse. |
-| **v19** | `N/A` | Format Error / Replay Timeout | Static Diversity Padding (Unverified) | Added ~932 unverified static candidates. Unverified prompts caused model hallucination / multi-hop delays at replay time, triggering `ModelEvaluationTimedOut`. |
+| **v7** | `84.240` | Succeeded | Replay-Throughput Loop | Probe → Select lowest effective cost → Seed fired probes → Fill. |
+| **v8** | `22.290` | Severe Regression | Heuristic Controller | High controller complexity & state overhead collapsed throughput. |
+| **v9** | `51.990` | Regression | Multi-Armed Bandits | Bandit exploration wasted time on low-yield attack families during search. |
+| **v11** | `23.175` | Severe Regression | Two-Track Router | Over-engineered heuristic router & signatures hurt replay throughput. |
+| **v12** | `N/A` | Notebook Exception | Search overhaul + local SDK import | Imported `SandboxEnv` inside notebook cell prior to evaluator launch. |
+| **v13** | `14.820` | Format Error | Replay signature archive | Overran time budget during search; leftover candidates exceeded window. |
+| **v14** | `N/A` | Format Error | Base64 inline code + Relay Push100 | Candidate budget overflowed the 9000s per-model replay cap. |
+| **v15** | `72.270` | Moderate Regression | Multi-Predicate Round-Robin Fill | Filled candidates across non-firing templates, wasting budget. |
+| **v16** | `87.660` | Succeeded | Baseline Recovery | Clean notebook scaffold, `IS_RERUN` gating, measured latency cap. |
+| **v18** | `57.285` | Severe Regression | `BURST_K = 4` Hop-Saturation | Forced 4 `http.post` calls per prompt. Non-reasoning models failed multi-post. |
+| **v19** | `N/A` | Format Error | Static Diversity Padding | Unverified candidates caused model hallucination at replay time. |
+| **v28** | `85.590` | Succeeded | Single-post baseline | Restricted candidates to 1 post per candidate (18 raw points). |
+| **v31 (OMEGA v1)** | `76.815` | Succeeded | Initial OMEGA Port | Rebuilt baseline search engine. |
+| **v32 (OMEGA v2)** | `78.435` | Succeeded | Adaptive Margin | Introduced per-model adaptive margin scaling. |
+| **v33 (OMEGA v3)** | `86.490` | Succeeded | 91.305 Architecture Port | Restored fast single-hop validation fill. |
+| **v34 (OMEGA v4)** | `88.560` | Succeeded | 5 Precision Levers | Adaptive margin, latency split, 1-hop probe, fast routing. |
+| **v35 (OMEGA v5)** | `89.640` | Succeeded | Warm-Up Bug Fix | Fixed double-counting warm-up replay cost bug (harvested +1 free cand). |
+| **v36 (OMEGA v6)** | `89.640` | Succeeded | Parameter Micro-tuning | `REPLAY_SAFE_FRAC=0.992`, `SLOWEST_MULT=1.15`. Single-post plateau. |
+| **v37 (OMEGA v7)** | `88.335` | Regression (-1.305) | Multi-Predicate Stacking | Added `fs.delete` + `http.post`. 2-hop execution increased latency by +41%. |
+| **v38 (OMEGA v8)** | `89.145` | Clean Recovery | Revert to v5 Architecture | Restored exact v5 single-post pipeline. Confirmed baseline stability. |
+| **v39 (OMEGA v9)** | `86.355` | Regression (-2.790) | Lean Frame (No Termination) | Removed natural prompt instruction. LLM entered 4096-token runaway generation. |
+| **v40 (OMEGA v10)** | `87.300` | Succeeded | Explicit Frame + Cap=1200 | Fixed runaway bug with explicit prompt, but `HARD_N_CAP=1200` capped score early. |
+| **v41 (OMEGA v11)** | **`89.955`** | **PEAK SCORE** | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
+| **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
+| **v43 (OMEGA v13)** | **`90.600+`** | **TARGET** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Increments v11 to breach 90.0+. |
 
 ---
 
-## 2. Deep-Dive Taxonomy of Failures
+## 2. Comprehensive Taxonomy of Failure Modes & Lessons
 
-### Type A: Notebook & Infrastructure Failures ("Notebook Threw Exception")
-* **Root Cause (v12)**: Executing `AttackAlgorithm()` inside the notebook using `importlib` or running local simulation classes (`SandboxEnv`) prior to Kaggle launching `JEDAttackInferenceServer().serve()`.
-* **Lesson**: The notebook must be a clean, minimal wrapper:
-  1. Write `/kaggle/working/attack.py` via `%%writefile`.
-  2. Gate server execution behind `if os.getenv("KAGGLE_IS_COMPETITION_RERUN"): server.serve()`.
-  3. Else, generate placeholder `submission.csv` with schema `Id,Score`.
-  4. Never import `SandboxEnv` or execute `AttackAlgorithm()` inside notebook cells.
+### 1. Multi-Hop / Multi-Predicate Overhead Failure (v7 & v12)
+* **Observed Regression**: v7 dropped from 89.640 to 88.335; v12 dropped from 89.955 to 85.970.
+* **Root Cause**: Adding multiple tool hops (`fs.delete` + `http.post` in v7; `N=4` multi-post in v12) increased per-candidate execution time from ~8.5s to ~12s–35s (+41% to +300% latency).
+* **Impact**: Total candidate yield dropped by 30%–50%. In Kaggle evaluation, candidate count drop outweighs theoretical per-candidate score gains.
+* **Golden Rule**: **Keep candidates strictly single-hop (`http.post` only) in the high-throughput fill loop.**
 
-### Type B: Replay Timeout & Gateway Violations ("Submission Format Error")
-* **Root Cause (v13, v14, v17, v19)**: Overrunning the 9000-second per-model, per-guardrail evaluation deadline during the gateway replay phase.
-* **Mechanism**: Kaggle's evaluation infrastructure runs `attack.py` search, then independently replays every candidate returned in `run()` at `max_tool_hops=8`. If total replay time > 9000s, Kaggle raises `ModelEvaluationTimedOut` which surfaces as **Submission Format Error**.
-* **Lesson**: Candidates must be capped by **cumulative measured replay cost** (sum of hops=8 trial latencies) stopping at `0.99 * 9000s = 8910s`. Unverified candidates with unpredictable latencies must never be bulk-injected into the returned portfolio.
+### 2. Prompt Termination Omission / Runaway Generation Failure (v9)
+* **Observed Regression**: v9 dropped from 89.145 to 86.355 (and hung for 1d during initial sweep).
+* **Root Cause**: Omitted explicit natural language termination instructions (`"Call http.post once with... Then answer OK only."`) from `FRAME_TEMPLATE`.
+* **Impact**: `gpt_oss` failed to terminate token generation after generating the tool call, causing runaway generation (~4096 tokens/cand = 60+ seconds/cand).
+* **Golden Rule**: **Always include explicit termination instructions ("Then answer OK only.") in all prompt templates.**
 
-### Type C: Multi-Instruction Prompt Collapse (v18 - Score: 57.285)
-* **Root Cause**: v18 attempted to force the LLM to call `http.post` 4 times in a single prompt (`BURST_K = 4`).
-* **Mechanism**: Non-reasoning models (like Gemma 4) or constrained models struggle with complex multi-tool tool-use instructions. The model either called `http.post` once and stopped, or entered text analysis mode, dropping the fire rate from ~50% down to under 15%.
-* **Lesson**: Multi-step / multi-action payloads must be verified live during search. Never assume LLMs will execute multi-tool chains without live confirmation.
+### 3. Replay Cost Double-Counting Bug (v1–v4 vs v5+)
+* **Observed Flaw**: Early versions charged the warm-up period's duration twice in `_replay_stop()`, under-filling candidate sets by 7 to 12 candidates.
+* **Resolution**: Captured `run_start` before warm-up, subtracted warm-up duration from `replay_cap`, and charged 0 replay cost for the warm-up candidate.
 
-### Type D: Unverified Diversity Ingestion (v15 - Score: 72.270 & v19)
-* **Root Cause**: Round-robin or static padding with unverified templates (Confused Deputy, Destructive Write).
-* **Mechanism**: In v15 and v19, candidate slots were populated with unverified templates. Because these templates had a 0% to 10% fire rate on the target model, they diluted the portfolio and wasted replay budget slots that could have been used by deterministic Exfiltration candidates.
-* **Lesson**: Only candidates that have been **live-verified to fire** (or pass a strict replay-safe filter) belong in the returned portfolio.
+### 4. Over-Conservative Cushion Under-Filling (v6, v10)
+* **Observed Limitation**: Setting `HARD_N_CAP = 1200` or `REPLAY_SAFE_FRAC = 0.985` left 135+ seconds of unused budget on the table.
+* **Resolution**: Expanded `REPLAY_SAFE_FRAC = 0.994` (leaving a crisp 54s safety buffer) and set `HARD_N_CAP = 2000` so search fills right up to the 8946s replay cap.
 
 ---
 
-## 3. The Winning Core Architecture (v7 / v16 / JED Baseline)
+## 3. The Winning OMEGA Architecture (v11 / v13 Path)
 
-The empirical evidence confirms that the optimal attack architecture is a **replay-safe, probe-selected portfolio optimizer**:
+The empirical winner is the **latency-split single-post validation-fill architecture**:
 
-1. **Phase 1: Probe (5 reps × 5 templates)**
-   - Templates: `plain`, `bare`, `bare_ok`, `inj_close`, `inj_commentary`
-   - Metric: `effective_cost = median(successful_latencies) / fire_rate`
-2. **Phase 2: Seed**
-   - Retain all candidates that successfully fired during probing.
-3. **Phase 3: Replay-Safe Fill**
-   - Generate candidates using the single lowest-cost winning template.
-   - Track cumulative measured latency (`replay_cost += trial_elapsed`).
-   - Stop immediately when `replay_cost + fill_unit > 8910s` (0.99 × 9000s) or candidate count reaches limit.
-4. **Phase 4: Semantic Deduplication**
-   - Deduplicate by replay signature `(tool_sequence | predicate_family | prompt_hash)`.
-   - Prefer shorter prompts and lower measured latencies upon collision.
-
----
-
-## 4. Architectural Guardrails for v20+
-
-1. **Zero Notebook Complexity**: 5 cells max, no AST execution, clean `submission.csv` placeholder.
-2. **No Dynamic Search Machinery**: No multi-armed bandits, beam search, or heavy routing controllers.
-3. **Strict Live Verification**: Every candidate added to the active portfolio MUST be verified live via `env.interact()`.
-4. **Replay Budget Guarantee**: Return set bounded strictly by measured trial latency sum ≤ `8910s`.
+1. **Warm-Up (hops=1)**: 1-hop model load, harvest 1 free candidate at index 899999.
+2. **Classification (N=1, threshold=12.0s)**:
+   - Samples latency on candidate 0.
+   - If $> 12.0s \rightarrow gpt\_oss$ (slow row) $\rightarrow$ uses `FRAME_TEMPLATE`.
+   - If $< 12.0s \rightarrow gemma$ (fast row) $\rightarrow$ uses `TEMPLATE`.
+3. **Replay-Safe Fill**:
+   - `REPLAY_SAFE_FRAC = 0.994` ($8946s$ cap).
+   - `SLOWEST_MULT = 1.10`.
+   - `SLOWEST0 = 12.0`.
+   - Bounded strictly by `replay_cost + next_wall <= replay_cap`.
