@@ -1,11 +1,11 @@
-# Strategy Library (Updated v43 / OMEGA Series)
+# Strategy Library (Updated v43 / OMEGA Series — Peak: 91.170)
 
 This library contains reusable tactics that have been empirically tested against the Kaggle evaluator. Only promote a strategy to "Preferred" if it is verified to improve the score and survive replay.
 
 ---
 
 ## 1. Latency-Split Single-Post Fill (OMEGA Core)
-- **Status**: **PREFERRED (PEAK BENCHMARK: 89.955 in v11)**
+- **Status**: **PREFERRED (PEAK BENCHMARK: 91.170 in v13 🏆)**
 - **Evidence Level**: **[VERIFIED - HIGHEST LB SCORE]**
 - **Purpose**: Maximize the number of firing Exfiltration candidates generated within the 9000s per-model budget.
 - **Mechanics**: Sample candidate 0 latency. Classify target model:
