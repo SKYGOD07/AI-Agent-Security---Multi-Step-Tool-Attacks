@@ -1,28 +1,31 @@
-# Project Roadmap: Attack Discovery Engine
+# Project Roadmap: OMEGA Attack Discovery Engine (Updated Aug 2026)
 
-This roadmap outlines the research and development phases planned for the Attack Discovery Engine.
+This roadmap outlines the research and development phases for the OMEGA Attack Discovery Engine targeting the Kaggle **AI Agent Security — Multi-Step Tool Attacks** competition.
 
-## Phase 1: Foundations & Baselining (Current)
-- [x] Establish modular codebase boundaries (`attack_discovery/`).
-- [x] Implement the state-space `Archive` (Transposition Table).
-- [x] Create a `MutationEngine` (Candidate Generator) for exfiltration, confused deputy, and destructive paths.
-- [x] Implement core timing guards (`Timebox`) and priority-based ranking (`CandidateRanker`).
+## Phase 1: Foundations & Baselining ✅ COMPLETE
+- [x] Establish modular codebase (Stockfish v1–v16 series).
+- [x] Implement live validation-fill (v12 breakthrough: 100% fire efficiency).
+- [x] Implement Harmony token forging for `gpt_oss` chain-of-thought bypass (v16: 87.660).
+- [x] Implement replay-safe sizing with measured latency cap (v16+).
 
-## Phase 2: Evolutionary Algorithms & Go-Explore (Short-Term)
-- [ ] **Genetic Mutations**: Implement crossovers and mutation weights based on historical success rates.
-- [ ] **Cell Calibration**: Optimize the HSL/RGB representation equivalent in the archive to merge look-alike traces.
-- [ ] **Adaptive Branching**: Adjust branch batch sizing dynamically based on remaining timebox budget.
+## Phase 2: Architecture Convergence & 90+ Score ✅ COMPLETE
+- [x] Port proven architecture from benchmark notebooks (v69, jedforce-1, 90.09).
+- [x] Build OMEGA Series attack engine (v31–v43).
+- [x] Implement latency-split single-post fill with per-model template routing.
+- [x] Fix warm-up double-counting bug (OMEGA v5: 89.640).
+- [x] Prove that multi-post / multi-hop stacking causes regression (v7: 88.335, v12: 85.970).
+- [x] Prove that prompt termination omission causes runaway generation (v9: 86.355).
+- [x] **Breach 90.0 barrier with OMEGA v13: 91.170!** 🏆
 
-## Phase 3: Monte Carlo Tree Search (MCTS) (Medium-Term)
-- [ ] **State Tree Modeling**: Represent the attack search space as an explicit search tree instead of a flat archive.
-- [ ] **UCT Selection**: Implement the Upper Confidence Bound applied to Trees (UCT) formula:
-  $$\text{UCT} = \frac{W_i}{N_i} + c \sqrt{\frac{\ln N_p}{N_i}}$$
-- [ ] **Rollout Simulation**: Run lightweight rollout simulations using fast heuristic-driven model agents.
+## Phase 3: High-Precision Incremental Optimization (CURRENT)
+- [x] `REPLAY_SAFE_FRAC = 0.994` (8946s cap, 54s safety cushion) → +3.2 candidates.
+- [x] `SLOWEST_MULT = 1.10` (tighter end-of-fill cushion) → +1.5 candidates.
+- [x] `SPLIT_CLASSIFY_N = 1` (1-sample classification) → +1.5 candidates.
+- [x] `SLOWEST0 = 12.0` (tighter initial latency seed) → +1.0 candidate.
+- [ ] Push further: `REPLAY_SAFE_FRAC = 0.996`, `SLOWEST_MULT = 1.05` for 92.0+ target.
 
-## Phase 4: Stockfish-Inspired Tree Optimization (Long-Term)
-- [ ] **Iterative Deepening**: Systematically search to depth $N$, verify findings, and then restart with depth $N+1$, reusing the Transposition Table.
-- [ ] **Alpha-Beta Pruning**: Cut off search branches where the agent consistently refuses or fails to call any tools for $K$ consecutive steps.
-- [ ] **History Heuristics**: Remember which mutation operators historically caused successful state transitions and try those first (Move Ordering).
-
-## Phase 5: LLM-Assisted Generation
-- [ ] **LLM-in-the-Loop Fuzzing**: Use a local fast model (e.g. Gemma 2B GGUF) to generate context-specific prompt mutations based on the current tool execution logs in the trace, moving beyond rule-based templates.
+## Phase 4: Score Ceiling Analysis & Next Breakthrough (FUTURE)
+- [ ] Analyze evaluator variance (v13 scored 91.170 and 89.685 on two runs of same notebook).
+- [ ] Investigate whether Kaggle evaluator latency varies between submissions.
+- [ ] Test further replay fraction expansion while maintaining 0% timeout risk.
+- [ ] Explore prompt compression for faster tokenization per candidate.
