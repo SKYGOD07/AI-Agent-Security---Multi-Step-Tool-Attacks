@@ -1,10 +1,13 @@
-# Handoff Packet: Red-Team AI Agent Security Engine
+# Handoff Packet: Red-Team AI Agent Security Engine (Updated Aug 2026)
 
-> **IMPORTANT**: The primary, comprehensive, 1000+ line handoff thesis for this repository is located at:
-> 
-> 📄 **[MASTER_AI_HANDOFF_THESIS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/MASTER_AI_HANDOFF_THESIS.md)**
+> **IMPORTANT**: The primary comprehensive handoff and failure analysis documents are:
+>
+> 🏆 **[FAILURES_AND_LESSONS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/FAILURES_AND_LESSONS.md)** — Master OMEGA post-mortem & architecture guide.
+> 📚 **[failure_analysis_and_knowledge_base.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/our_work/docs/failure_analysis_and_knowledge_base.md)** — Complete version taxonomy (v4–v43).
 
 ## Quick Handoff Summary
-- **Current Version**: `stockfish_v29_attack.ipynb` (Decoded from `ai-agent-security-90.ipynb`, **Public Score Target: 90.090+**)
-- **Key Mechanics**: Asymmetric Dual-Track Multi-Post Routing (`SLOW_MULTIPOST_N = 4` for `gpt_oss` via token forging, `BURST_K = 2` for `gemma`).
-- **Scaffolding**: Base64 attack script encoding + defensive `try/except` imports + defensive `__init__` (Zero Format Error Guarantee).
+- **Current Version**: `omega_v13_attack.ipynb` (v43) — **Peak Public Score: 91.170**
+- **Key Architecture**: Latency-Split Single-Post Validation-Fill with high-precision replay-safe sizing.
+- **Key Parameters**: `REPLAY_SAFE_FRAC = 0.994`, `SLOWEST_MULT = 1.10`, `SPLIT_CLASSIFY_N = 1`, `SLOWEST0 = 12.0`.
+- **Scaffolding**: Base64 attack encoding + defensive `try/except` imports + defensive `__init__` (Zero Format Error Guarantee).
+- **Build Command**: `python our_work/versions/v43/build_v43.py`
