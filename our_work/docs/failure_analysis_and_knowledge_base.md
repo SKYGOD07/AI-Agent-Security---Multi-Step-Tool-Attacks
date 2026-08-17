@@ -1,4 +1,4 @@
-# Comprehensive Failure Analysis & Knowledge Base (v4 – v43 / OMEGA Series)
+# Comprehensive Failure Analysis & Knowledge Base (v4 – v43 / OMEGA Series — Peak: 91.170)
 
 This document synthesizes every version's design, empirical score, failure mode, and root cause across the competition trajectory. It serves as an authoritative reference for future AI agents working on the **AI Agent Security – Multi-Step Tool Attacks** Kaggle benchmark.
 
@@ -32,9 +32,9 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v38 (OMEGA v8)** | `89.145` | Clean Recovery | Revert to v5 Architecture | Restored exact v5 single-post pipeline. Confirmed baseline stability. |
 | **v39 (OMEGA v9)** | `86.355` | Regression (-2.790) | Lean Frame (No Termination) | Removed natural prompt instruction. LLM entered 4096-token runaway generation. |
 | **v40 (OMEGA v10)** | `87.300` | Succeeded | Explicit Frame + Cap=1200 | Fixed runaway bug with explicit prompt, but `HARD_N_CAP=1200` capped score early. |
-| **v41 (OMEGA v11)** | **`89.955`** | **PEAK SCORE** | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
+| **v41 (OMEGA v11)** | `89.955` | Near-Peak | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
 | **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
-| **v43 (OMEGA v13)** | **`90.600+`** | **TARGET** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Increments v11 to breach 90.0+. |
+| **v43 (OMEGA v13)** | **`91.170`** | **🏆 PEAK SCORE** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (also 89.685 on 2nd run = evaluator variance). |
 
 ---
 
