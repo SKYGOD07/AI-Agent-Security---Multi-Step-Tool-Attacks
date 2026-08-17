@@ -1,33 +1,28 @@
-# Failure Blacklist
+# Failure Blacklist (Updated August 2026 — OMEGA v13 Peak: 91.170)
 
 This document records architectural patterns that definitively fail on the Kaggle evaluator. **Never repeat these patterns.**
 
 ## 1. Type A: Notebook Execution Exceptions
 **Symptoms**: Kaggle returns `Notebook Threw Exception` immediately upon submission. **[VERIFIED]**
 **Root Cause**: Attempting to execute the attack logic, load the local SDK, or evaluate predicates inside a notebook cell before the official Kaggle evaluation server takes over. **[VERIFIED]**
-**Offending Code**:
-```python
-# NEVER DO THIS IN A NOTEBOOK CELL
-spec = importlib.util.spec_from_file_location("attack", "attack.py")
-module = importlib.util.module_from_spec(spec)
-sys.modules["attack"] = module
-spec.loader.exec_module(module)
-algo = module.AttackAlgorithm()
-```
-**Fix**: Use the strict 5-cell scaffold. Write `attack.py` to disk using `%%writefile`. Gate all execution behind `os.getenv("KAGGLE_IS_COMPETITION_RERUN")`. **[VERIFIED]**
+**Fix**: Use the 3-cell Base64 scaffold. Write `attack.py` to disk via base64 decoding. Gate all execution behind `os.getenv("KAGGLE_IS_COMPETITION_RERUN")`. **[VERIFIED]**
 
 ## 2. Type B: Gateway / Replay Timeout Overruns
 **Symptoms**: Kaggle returns `Submission Format Error` after ~20-30 minutes of running. **[VERIFIED]**
-**Root Cause**: The returned candidate list takes longer than 9000 seconds to replay in the hidden environment. The evaluator forcibly terminates the container (`ModelEvaluationTimedOut`), which manifests as a format error because no valid `submission.csv` was finalized. **[STRONG EVIDENCE]**
-**Fix**: The algorithm must track `cumulative_replay_cost` by summing the actual measured latency of successful probes during search. Stop adding candidates when `cumulative_replay_cost > 8910s`. **[STRONG EVIDENCE]**
+**Root Cause**: The returned candidate list takes longer than 9000 seconds to replay. **[STRONG EVIDENCE]**
+**Fix**: Track `cumulative_replay_cost` by summing actual measured latency. Stop adding candidates when `cumulative_replay_cost > REPLAY_SAFE_FRAC * 9000s`. Optimal: `REPLAY_SAFE_FRAC = 0.994` (8946s cap). **[VERIFIED — v13 scored 91.170]**
 
 ## 3. Type C: Unverified Diversity / Static Padding Dilution
-**Symptoms**: Score collapses significantly below baseline (e.g., v15 scored 72; v19 timed out entirely). **[VERIFIED]**
-**Root Cause**: Padding the `candidates` list with prompts that were not verified to fire during the search phase. **[STRONG EVIDENCE]**
-**Why it fails**: Target models (Gemma, GPT-OSS) often hallucinate, analyze, or get confused by unverified prompts. This leads to maximum `max_tool_hops=8` evaluation loops with zero predicate violations, destroying the replay budget and diluting the score. **[HYPOTHESIS]**
-**Fix**: Every candidate returned must be verified to fire via a live `env.interact()` trial. **[STRONG EVIDENCE]**
+**Symptoms**: Score collapses significantly below baseline (v15 scored 72; v19 timed out). **[VERIFIED]**
+**Root Cause**: Padding the candidates list with prompts not verified to fire. **[STRONG EVIDENCE]**
+**Fix**: Every candidate returned must be verified via a live `env.interact()` trial. **[VERIFIED]**
 
-## 4. Type D: Multi-Instruction Tool Collapse (BURST_K)
-**Symptoms**: Fire rates collapse from ~50% to < 15%. Score plummets (v18 scored 57). **[VERIFIED]**
-**Root Cause**: Instructing the model to call a tool multiple times in one interaction (e.g., "Call http.post 4 times"). Target models lack the strict instruction-following capabilities required to reliably execute complex loops without breaking out into text generation. **[HYPOTHESIS]**
-**Fix**: Prefer single, targeted instructions. (e.g., "Send X to Y using http.post now.") **[STRONG EVIDENCE]**
+## 4. Type D: Multi-Post / Multi-Hop Latency Overhead
+**Symptoms**: Score drops despite higher per-candidate point yield. **[VERIFIED]**
+**Root Cause**: Multi-post stacking (`SLOW_MULTIPOST_N > 1`) or multi-predicate stacking (`http.post` + `fs.delete`) increases per-candidate execution time by +41% to +300%, reducing total candidate yield. **[VERIFIED — v7 dropped to 88.335, v12 dropped to 85.970]**
+**Fix**: Keep candidates strictly single-hop (`BURST_K = 1`, `SLOW_MULTIPOST_N = 1`). The throughput bottleneck is fill efficiency, not per-candidate yield. **[VERIFIED — v13 scored 91.170 with single-post]**
+
+## 5. Type E: Prompt Termination Omission
+**Symptoms**: Per-candidate latency explodes to 60+ seconds. Score drops. **[VERIFIED]**
+**Root Cause**: Omitting explicit termination instructions causes `gpt_oss` to enter 4096-token runaway generation. **[VERIFIED — v9 dropped to 86.355]**
+**Fix**: Always include "Then answer OK only." in all prompt templates. **[VERIFIED]**
