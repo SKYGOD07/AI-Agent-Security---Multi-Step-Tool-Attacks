@@ -34,7 +34,8 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v40 (OMEGA v10)** | `87.300` | Succeeded | Explicit Frame + Cap=1200 | Fixed runaway bug with explicit prompt, but `HARD_N_CAP=1200` capped score early. |
 | **v41 (OMEGA v11)** | `89.955` | Near-Peak | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
 | **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
-| **v43 (OMEGA v13)** | **`91.170`** | **🏆 PEAK SCORE** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (also 89.685 on 2nd run = evaluator variance). |
+| **v43 (OMEGA v13)** | **`91.170`** | **🏆 PEAK SCORE** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (89.685 on 2nd run). |
+| **v44 (OMEGA v14)** | `86.760` | Regression (-4.410) | Precision Squeeze | `COEF=0.97` under-estimated replay cost $\rightarrow$ replay budget overflow $\rightarrow$ candidates cut off. |
 
 ---
 
