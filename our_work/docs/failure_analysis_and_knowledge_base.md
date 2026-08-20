@@ -36,6 +36,8 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
 | **v43 (OMEGA v13)** | **`91.170`** | **🏆 PEAK SCORE** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (89.685 on 2nd run). |
 | **v44 (OMEGA v14)** | `86.760` | Regression (-4.410) | Precision Squeeze | `COEF=0.97` under-estimated replay cost $\rightarrow$ replay budget overflow $\rightarrow$ candidates cut off. |
+| **v45 (OMEGA v15)** | `88.920` | Regression (-2.250) | Prompt Micro-Trim | Micro-trimmed prompt wording slightly degraded fire rate on `gemma`. |
+| **v46 (OMEGA v16)** | `62.410` | Severe Regression | Fast 1-Hop Probing | `PROBE_HOPS=1` under-estimated 8-hop replay cost by 50% $\rightarrow$ replay timeout at cand #693. |
 
 ---
 
