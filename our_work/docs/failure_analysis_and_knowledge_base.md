@@ -38,6 +38,7 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v44 (OMEGA v14)** | `86.760` | Regression (-4.410) | Precision Squeeze | `COEF=0.97` under-estimated replay cost $\rightarrow$ replay budget overflow $\rightarrow$ candidates cut off. |
 | **v45 (OMEGA v15)** | `88.920` | Regression (-2.250) | Prompt Micro-Trim | Micro-trimmed prompt wording slightly degraded fire rate on `gemma`. |
 | **v46 (OMEGA v16)** | `62.410` | Severe Regression | Fast 1-Hop Probing | `PROBE_HOPS=1` under-estimated 8-hop replay cost by 50% $\rightarrow$ replay timeout at cand #693. |
+| **v48 (OMEGA v18)** | `88.830` | Regression (-2.340) | Multi-Warmup Harvest | Extra warm-up candidates consumed 25.5s of replay budget $\rightarrow$ main fill loop stopped 2 cands early. |
 
 ---
 
