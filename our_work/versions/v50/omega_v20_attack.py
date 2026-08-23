@@ -305,6 +305,9 @@ class AttackAlgorithm(AttackAlgorithmBase):
         for kind, msg, lat, pts in harvested:
             banked.append({"kind": kind, "msg": msg, "lat": lat, "points": pts})
             replay_cost += lat * replay_coef
+        for res in probe_results:
+            for lat in res.lats:
+                slowest = max(slowest, lat)
         winner = self._select_kind(probe_results)
 
         # ---- VALIDATION FILL with the measured winner ----
