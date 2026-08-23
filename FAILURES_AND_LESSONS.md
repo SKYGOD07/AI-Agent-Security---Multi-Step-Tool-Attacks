@@ -8,14 +8,20 @@ This master document synthesizes all failure post-mortems, breakthroughs, and ar
 ## 1. Master Score Trajectory
 
 ```
-v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170 PEAK🏆) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830 REGRESSION) -> v19 (91.530+ TARGET)
+v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170 PEAK🏆) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650 REGRESSION)
 ```
 
 ---
 
 ## 2. Exhaustive Post-Mortem Matrix & Failure Taxonomy
 
-### A. v18 Post-Mortem: Why Multi-Warmup Candidates Dropped Score to 88.830
+### A. v19 Post-Mortem: Why Harmony-Forged Warmup Dropped Score to 88.650
+- **The Experiment**: v19 used `FRAME_TEMPLATE` (Harmony channel tokens) for warmup instead of `TEMPLATE`, hoping to bypass CoT during model load and save 15 seconds.
+- **The Mechanism**: The Harmony-forged warmup template did not provide measurable benefit; the warmup interaction with `FRAME_TEMPLATE` may have interfered with initial model state or produced slightly different warm-up latency dynamics than expected.
+- **Result**: Score dropped from 91.170 to 88.650 — another regression.
+- **Rule**: Do NOT change the warmup template from the v13 baseline (`TEMPLATE`). Warmup template changes have no proven benefit.
+
+### B. v18 Post-Mortem: Why Multi-Warmup Candidates Dropped Score to 88.830
 - **The Experiment**: v18 probed 3 warm-up candidates (`899999`, `899998`, `899997`) at `max_tool_hops=1` during model load.
 - **The Mechanism**:
   1. Warm-up interactions at search time ran for 13.5s, reducing initial `replay_cap` by 9s.

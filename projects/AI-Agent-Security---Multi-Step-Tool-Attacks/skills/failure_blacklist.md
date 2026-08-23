@@ -1,4 +1,10 @@
-# Failure Blacklist — Permanent Memory (Updated v4 – v48 — Peak: 91.170 🏆)
+# Failure Blacklist — Permanent Memory (Updated v4 – v49 — Peak: 91.170 🏆)
+
+## v49 (OMEGA v19): Harmony-Forged Warmup Regression (Score: 88.650)
+**Root cause**: Used `FRAME_TEMPLATE` (Harmony channel tokens) for warmup instead of `TEMPLATE`, hoping to bypass CoT during model load and save 15 seconds. The trick did not provide measurable benefit; warmup with `FRAME_TEMPLATE` may have interfered with initial model state, causing a net regression.
+**Rule**: Do NOT change the warmup template from the v13 baseline (`TEMPLATE`). Warmup template changes have no proven benefit.
+
+---
 
 ## v48 (OMEGA v18): Multi-Warmup Replay Overhead Regression (Score: 88.830)
 **Root cause**: Probing 3 warm-up candidates (`899999`, `899998`, `899997`) during search returned all 3 candidates in `cands`. During Kaggle's offline replay at forced `max_tool_hops=8`, replaying 3 candidates consumed **$3 \times 8.5s = 25.5s$ of replay budget**. The warm-up candidates were NOT free during offline replay! Consuming 25.5s of replay budget forced the main fill loop to stop 2 candidates earlier, dropping score to 88.830.
