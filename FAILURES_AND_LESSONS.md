@@ -15,6 +15,32 @@ v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (8
 
 ## 2. Exhaustive Post-Mortem Matrix & Failure Taxonomy
 
+### A0. v20 (ORACLE) Post-Mortem: Why the Live Tournament Dropped Score to 86.070
+- **The Experiment**: v20 replaced v13's 1-sample latency classification with a 5-type × 3-rep
+  live tournament (core / frame / bare / inject / deputy), selected by measured point-density
+  with an 8% challenger margin, sized fills under a "separate search/replay budget" model, and
+  seeded the stop-rule `slowest` variable from ALL probe latencies.
+- **Result**: 86.070 — a −5.10 regression (~57 candidates lost vs v13's ~1013).
+- **Root Causes (three compounding effects)**:
+  1. **Tournament time theft**: 15 probe interactions × 10–20s each consumed 150–300s of every
+     model's fill window ≈ −18 to −35 candidates per model, only partially offset by harvesting
+     fired probes.
+  2. **Stop-rule state contamination**: exotic-template probes (Harmony `inject`, two-action
+     `deputy`) produced long responses whose latencies inflated the global `slowest` seed; the
+     `slowest × SLOWEST_MULT` cushion on BOTH stop checks then triggered premature fill stops.
+  3. **Selection noise**: 3-rep density estimates carry variance far above the 8% switch margin;
+     a wrongly-selected template (e.g., `deputy`, whose extra round-trip only breaks even if its
+     latency ≤ 1.222× a single-post candidate's, or Harmony tokens confusing non-Harmony gemma)
+     degraded fire-rate/latency for the ENTIRE remaining run.
+- **Rules (v21 doctrine)**:
+  - Experimentation must be HARVESTED (fired probes become submitted candidates) and
+    STATE-ISOLATED (never update stop-rule variables from experimental interactions).
+  - Selection switches require SUPER-MAJORITY evidence (≥4/5 fired + ≥20% measured speedup),
+    and must be ROW-SCOPED: never experiment on the fragile fast row (gemma wording sensitivity,
+    see v15).
+  - The separate-budget finding itself REMAINS VALID (v13's own score mathematically requires
+    independent replay windows); what failed was coupling it to noisy measurements.
+
 ### A. v19 Post-Mortem: Why Harmony-Forged Warmup Dropped Score to 88.650
 - **The Experiment**: v19 used `FRAME_TEMPLATE` (Harmony channel tokens) for warmup instead of `TEMPLATE`, hoping to bypass CoT during model load and save 15 seconds.
 - **The Mechanism**: The Harmony-forged warmup template did not provide measurable benefit; the warmup interaction with `FRAME_TEMPLATE` may have interfered with initial model state or produced slightly different warm-up latency dynamics than expected.
