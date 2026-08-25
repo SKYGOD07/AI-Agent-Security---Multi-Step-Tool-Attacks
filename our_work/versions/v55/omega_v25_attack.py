@@ -111,11 +111,12 @@ DEFAULT_BUDGET_S = 9000.0
 # ---- Tournament knobs ----
 AB_ENABLED = True
 AB_SLOTS_PER_VARIANT = 4
-AB_COMMIT_FIRE = 3            # >=3/4 fires to qualify
+AB_COMMIT_FIRE = 4            # >=4/4 fires to qualify (tightened: v21=80.865 lesson)
 AB_COMMIT_DENSITY = 1.08      # challenger needs >=8% density advantage over frame
-RACE_ENABLED = True           # fast-row core-vs-deputy micro-race
+RACE_ENABLED = False          # fast-row race opt-in (probe-cost calibration: v23 -0.18)
 RACE_SLOTS = 4
 DOMAIN_RACE_SLOTS = 12
+DOMAIN_RACE_DEFAULT = False   # opt-in after real-model calibration (v23 -0.18 lesson)
 DOMAIN_COMMIT_SPEED = 0.97    # short scheme needs >=3% faster mean, non-inferior fire
 
 
@@ -371,7 +372,7 @@ class AttackAlgorithm(AttackAlgorithmBase):
                         chosen = DEPUTY_TEMPLATE
 
         # ---- DOMAIN SCHEME RACE (legacy vs short; non-inferior fire + >=3% faster) ----
-        domain_race_on = bool(self.config.get("domain_race_enabled", True))
+        domain_race_on = bool(self.config.get("domain_race_enabled", DOMAIN_RACE_DEFAULT))
         race_n = max(4, int(self.config.get("domain_race_slots", DOMAIN_RACE_SLOTS)))
         dom_speed = float(self.config.get("domain_commit_speed", DOMAIN_COMMIT_SPEED))
         if domain_race_on:

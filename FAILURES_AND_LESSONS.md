@@ -15,6 +15,22 @@ v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (8
 
 ## 2. Exhaustive Post-Mortem Matrix & Failure Taxonomy
 
+### A-1. Five-Book Proposal Triage (v24-v28 concepts) - Two Rejected on Evidence
+- **Supply-Side Prompt Compression (proposed Book 1): REJECTED.** Re-proposes the exact
+  v15 failure (trimming once-with/Then) banned by rule #9; its ~0.4s-per-candidate claim
+  is physically wrong (prefill costs microseconds per token; only GENERATED tokens matter).
+  The valid form - generated-token compression via Harmony prefill - shipped as v23.
+- **Dual-Track Asymmetric Model Split (proposed Book 5): ALREADY EXISTS** as v13
+  classification + v21-v23 row-scoped tournaments.
+- **Accepted with modifications**: token-frugal domains (Book 2 -> v54 QUAD, guardrail-safe
+  label filtering + measured race, opt-in), density-gated deputy portfolio (Book 3 -> v54
+  QUAD, replacing the displacement-blind +4.4pt claim), p90-window stop sizing (Book 4 ->
+  v55 ADAPTIVE, with a hard generation-deadline guard because a pure EMA can underestimate
+  into a fatal search overrun).
+- **Calibration applied after live scores (v21=80.865, v22=91.305 PEAK, v23=91.125)**:
+  probe machinery carries real tail risk; v54/v55 ship with tightened gates (4/4 fires)
+  and races default-OFF so the default configuration degrades to the proven v22 peak path.
+
 ### A0. v22 (BACKFILL) Breakthrough: New All-Time Peak Score 91.305 🏆
 - **The Innovation**: Introduced two-phase backfill architecture (`PRIMARY_REPLAY_FRAC = 0.945` + `BACKFILL_REPLAY_FRAC = 0.995` / `BACKFILL_WALL_FRAC = 0.997`).
 - **Why It Succeeded**:
