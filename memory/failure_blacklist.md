@@ -1,6 +1,13 @@
-# Failure Blacklist (Updated August 2026 — OMEGA v13 Peak: 91.170)
+# Failure Blacklist (Updated August 2026 — OMEGA v22 Peak: 91.305 🏆)
 
 This document records architectural patterns that definitively fail on the Kaggle evaluator. **Never repeat these patterns.**
+
+## 0. Type F: Stop-Rule Latency Contamination & Unverified Prefill Noise (v20, v21)
+**Symptoms**: Score drops to 86.070 (v20) or 80.865 (v21).
+**Root Cause**: Updating `slowest` with experimental probe latencies inflates `slowest * 1.10`, cutting off fill early. Also, unverified prefill text (`INJ_CLOSE`) confuses `gpt_oss`.
+**Fix**: Isolate experimental latencies from `slowest`. Keep champion templates byte-exact (`TEMPLATE` & `FRAME_TEMPLATE`). Use two-phase backfill sizing (v22).
+
+---
 
 ## 1. Type A: Notebook Execution Exceptions
 **Symptoms**: Kaggle returns `Notebook Threw Exception` immediately upon submission. **[VERIFIED]**

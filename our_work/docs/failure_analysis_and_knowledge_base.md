@@ -34,11 +34,16 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v40 (OMEGA v10)** | `87.300` | Succeeded | Explicit Frame + Cap=1200 | Fixed runaway bug with explicit prompt, but `HARD_N_CAP=1200` capped score early. |
 | **v41 (OMEGA v11)** | `89.955` | Near-Peak | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
 | **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
-| **v43 (OMEGA v13)** | **`91.170`** | **🏆 PEAK SCORE** | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (89.685 on 2nd run). |
+| **v43 (OMEGA v13)** | `91.170` | Succeeded | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (89.685 on 2nd run). |
 | **v44 (OMEGA v14)** | `86.760` | Regression (-4.410) | Precision Squeeze | `COEF=0.97` under-estimated replay cost $\rightarrow$ replay budget overflow $\rightarrow$ candidates cut off. |
 | **v45 (OMEGA v15)** | `88.920` | Regression (-2.250) | Prompt Micro-Trim | Micro-trimmed prompt wording slightly degraded fire rate on `gemma`. |
 | **v46 (OMEGA v16)** | `62.410` | Severe Regression | Fast 1-Hop Probing | `PROBE_HOPS=1` under-estimated 8-hop replay cost by 50% $\rightarrow$ replay timeout at cand #693. |
 | **v48 (OMEGA v18)** | `88.830` | Regression (-2.340) | Multi-Warmup Harvest | Extra warm-up candidates consumed 25.5s of replay budget $\rightarrow$ main fill loop stopped 2 cands early. |
+| **v49 (OMEGA v19)** | `88.650` | Regression (-2.520) | Harmony Warmup | Warmup with `FRAME_TEMPLATE` altered initial model load state with no benefit. |
+| **v50 (OMEGA v20)** | `86.070` | Regression (-5.100) | Live 5-Type Tournament | 15-probe overhead, stop-rule contamination, and noisy 3-rep density switching. |
+| **v51 (OMEGA v21)** | `80.865` | Severe Regression (-10.305) | Slow-Row A/B Slots | `INJ_CLOSE_TEMPLATE` prefill text confused `gpt_oss`, lowering fire rate and inflating latency. |
+| **v52 (OMEGA v22)** | **`91.305`** | **🏆 NEW PEAK SCORE** | **Two-Phase Backfill Sizing** | Recovered idle window (Primary 0.945 + Backfill 0.995/0.997). Added +3-5 cands cleanly! |
+| **v53 (OMEGA v23)** | **`91.125`** | **Near-Peak** | **Trident 3-Depth Tournament** | 3-depth slow-row tournament over v22 backfill; fallback safely retained FRAME_TEMPLATE. |
 
 ---
 

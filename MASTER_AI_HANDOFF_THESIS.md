@@ -3,7 +3,7 @@
 **Author / Lead Architect**: Antigravity AI Pair Programmer
 **Target Audience**: Successor AI Assistant / AI Models working on this codebase
 **Repository**: `SKYGOD07/AI-Agent-Security---Multi-Step-Tool-Attacks`
-**Date**: August 2026 (Updated for OMEGA v13 Peak: 91.170)
+**Date**: August 2026 (Updated for OMEGA v22 Peak: 91.305 🏆)
 
 ---
 
@@ -14,9 +14,9 @@
 > You are reading the authoritative, complete handoff thesis for the Kaggle competition **"AI Agent Security - Multi-Step Tool Attacks"**.
 >
 > **BEFORE WRITING ANY CODE OR MODIFYING ANY NOTEBOOK:**
-> 1. Read this entire document carefully. It contains the exact mathematical rules, failure modes, benchmark scores, and architectural breakthroughs established over 43 iterations.
-> 2. Respect the **Failure Blacklist** (§7). Never re-introduce multi-post stacking, prompt termination omission, unverified candidate padding, or uncalibrated replay fractions.
-> 3. Understand that your primary objective is to build upon **OMEGA v13** (`omega_v13_attack.ipynb` / `omega_v13_attack.py`), which achieved **91.170 public score**. Your goal is to reach **92+ to 95+ score** in v14 and beyond.
+> 1. Read this entire document carefully. It contains the exact mathematical rules, failure modes, benchmark scores, and architectural breakthroughs established over 53 iterations.
+> 2. Respect the **Failure Blacklist** (§7). Never re-introduce multi-post stacking, prompt termination omission, unverified candidate padding, stop-rule latency contamination, or unverified prefill text.
+> 3. Understand that your primary objective is to build upon **OMEGA v22** (`omega_v22_attack.ipynb` / `omega_v22_attack.py`), which achieved the all-time repo peak score of **91.305 public score**. Your goal is to reach **95+ to 138+ score** in v24 and beyond.
 
 ---
 
@@ -99,7 +99,12 @@ $$\text{Public Score} = \frac{\text{Score}(\text{gpt\_oss\_public}) + \text{Scor
 | OMEGA v10 (v40) : Explicit Termination + Cap                  -> Score: 87.300     |
 | OMEGA v11 (v41) : FRAC=0.991, MULT=1.15, N=2                 -> Score: 89.955     |
 | OMEGA v12 (v42) : Multi-Post Token Forging (REGRESSION)       -> Score: 85.970     |
-| OMEGA v13 (v43) : FRAC=0.994, MULT=1.10, N=1, SLOW0=12       -> Score: 91.170  🏆 |
+| OMEGA v13 (v43) : FRAC=0.994, MULT=1.10, N=1, SLOW0=12       -> Score: 91.170     |
+| OMEGA v19 (v49) : Harmony Warmup (REGRESSION)                  -> Score: 88.650     |
+| OMEGA v20 (v50) : Live 5-Type Tournament (REGRESSION)          -> Score: 86.070     |
+| OMEGA v21 (v51) : Slow-Row A/B Slots (REGRESSION)             -> Score: 80.865     |
+| OMEGA v22 (v52) : Two-Phase Backfill Sizing (ALL-TIME PEAK!)   -> Score: 91.305  🏆 |
+| OMEGA v23 (v53) : Trident 3-Depth Tournament                   -> Score: 91.125     |
 +-----------------------------------------------------------------------------------+
 ```
 

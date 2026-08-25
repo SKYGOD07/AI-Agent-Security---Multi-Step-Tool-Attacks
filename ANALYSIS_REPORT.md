@@ -1,5 +1,5 @@
 # AI Agent Security - Multi-Step Tool Attacks: Comprehensive Research & Analysis Report
-## Updated August 2026 — OMEGA v13 Peak Score: 91.170
+## Updated August 2026 — OMEGA v22 Peak Score: 91.305 🏆
 
 ## Project Overview
 
@@ -29,7 +29,7 @@ Key Competition Rules & Scoring Constraints:
 | v24 | 84.645 | 5-Template Race | Stable Baseline |
 | v28 | 85.590 | v69 arch + defensive Base64 | Validated Safe |
 
-### OMEGA Series (v31–v43) — Current Active Series
+### OMEGA Series (v31–v53) — Current Active Series
 
 | Version | Public Score | Architecture | Status |
 | :--- | :---: | :--- | :--- |
@@ -43,7 +43,11 @@ Key Competition Rules & Scoring Constraints:
 | v40 (OMEGA v10) | 87.300 | Explicit Termination + Cap | Under-Filled |
 | v41 (OMEGA v11) | **89.955** | `FRAC=0.991`, `MULT=1.15`, `N=2` | Near-Peak |
 | v42 (OMEGA v12) | 85.970 | Multi-Post Token Forging (`N=4`) | **REGRESSION** |
-| **v43 (OMEGA v13)** | **91.170** | **`FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`** | **🏆 PEAK SCORE** |
+| v43 (OMEGA v13) | **91.170** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12` | Benchmark |
+| v50 (OMEGA v20) | 86.070 | Live 5-Type Tournament | **REGRESSION** |
+| v51 (OMEGA v21) | 80.865 | Slow-Row A/B Slots | **REGRESSION** |
+| **v52 (OMEGA v22)** | **91.305** | **Two-Phase Backfill Sizing** | **🏆 REPO PEAK** |
+| v53 (OMEGA v23) | **91.125** | **Trident 3-Depth Tournament** | Near-Peak |
 
 ---
 

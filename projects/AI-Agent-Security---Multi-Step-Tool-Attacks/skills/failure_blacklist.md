@@ -1,6 +1,16 @@
-# Failure Blacklist — Permanent Memory (Updated v4 – v49 — Peak: 91.170 🏆)
+# Failure Blacklist — Permanent Memory (Updated v4 – v53 — Peak: 91.305 🏆)
 
-## v49 (OMEGA v19): Harmony-Forged Warmup Regression (Score: 88.650)
+## v51 (OMEGA v21): Slow-Row A/B Prefill Confusion (Score: 80.865)
+**Root cause**: Alternating 10 slots of `INJ_CLOSE_TEMPLATE` prefill text during fill confused `gpt_oss`, causing non-firing slots and latency spikes.
+**Rule**: NEVER experiment with unverified prefill prompt text in the early fill loop.
+
+---
+
+## v50 (OMEGA v20): Live Multi-Type Tournament Overhead & Stop Contamination (Score: 86.070)
+**Root cause**: Probing 5 candidate types x 3 reps (15 probes) consumed 150-300s of wall-clock time. Worse, exotic probe latencies updated the global `slowest` variable, inflating `slowest * 1.10` and triggering premature stop conditions that cut off ~57 candidates.
+**Rule**: NEVER update global stop-rule latency variables (`slowest`) with experimental or probe latencies.
+
+---
 **Root cause**: Used `FRAME_TEMPLATE` (Harmony channel tokens) for warmup instead of `TEMPLATE`, hoping to bypass CoT during model load and save 15 seconds. The trick did not provide measurable benefit; warmup with `FRAME_TEMPLATE` may have interfered with initial model state, causing a net regression.
 **Rule**: Do NOT change the warmup template from the v13 baseline (`TEMPLATE`). Warmup template changes have no proven benefit.
 

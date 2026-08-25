@@ -1,5 +1,5 @@
-# OMEGA Master Failure Post-Mortem & Architecture Guide (v1 – v18 / v31 – v48)
-## Updated August 2026 — OMEGA v13 Confirmed Peak: 91.170 🏆 | v18 Post-Mortem Analysis
+# OMEGA Master Failure Post-Mortem & Architecture Guide (v1 – v23 / v31 – v53)
+## Updated August 2026 — OMEGA v22 Confirmed Peak: 91.305 🏆 | v20-v23 Post-Mortem Analysis
 
 This master document synthesizes all failure post-mortems, breakthroughs, and architectural lessons learned during the development of the **OMEGA Attack Series** for the Kaggle **AI Agent Security – Multi-Step Tool Attacks** competition.
 
@@ -8,14 +8,32 @@ This master document synthesizes all failure post-mortems, breakthroughs, and ar
 ## 1. Master Score Trajectory
 
 ```
-v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170 PEAK🏆) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650 REGRESSION)
+v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650) -> v20 (86.070) -> v21 (80.865) -> v22 (91.305 PEAK🏆) -> v23 (91.125)
 ```
 
 ---
 
 ## 2. Exhaustive Post-Mortem Matrix & Failure Taxonomy
 
-### A0. v20 (ORACLE) Post-Mortem: Why the Live Tournament Dropped Score to 86.070
+### A0. v22 (BACKFILL) Breakthrough: New All-Time Peak Score 91.305 🏆
+- **The Innovation**: Introduced two-phase backfill architecture (`PRIMARY_REPLAY_FRAC = 0.945` + `BACKFILL_REPLAY_FRAC = 0.995` / `BACKFILL_WALL_FRAC = 0.997`).
+- **Why It Succeeded**:
+  1. **Recovering Idle Cushions**: Previous versions (v13/v18-v20) stopped early because `slowest * 1.10` left ~4-8% of the 9000s budget unutilized on both search wall-clock and replay cap.
+  2. **Risk-Shaped Phasing**: Primary phase guaranteed a safe batch (~94.5% budget), while the backfill phase converted the trailing 5% idle window into ~3-5 additional high-quality candidates.
+  3. **Preserved v13 Champions**: Retained byte-exact `TEMPLATE` & `FRAME_TEMPLATE` wording with latency-ascending submission ordering.
+- **Score Result**: **91.305** — New Repo Peak Benchmark! 🏆
+
+### A0.1. v23 (TRIDENT) Post-Mortem: High Performance (Score: 91.125)
+- **The Experiment**: 3-depth slow-row Harmony tournament (`frame`, `inject`, `prefill`) over v22's two-phase backfill architecture.
+- **Result**: **91.125** — Highly stable performance matching peak benchmark levels.
+- **Lesson**: Safe fallback logic retained `FRAME_TEMPLATE` when experimental prefill variants failed to beat the 0.80x speed margin, preserving the v22 backfill baseline.
+
+### A0.2. v21 (SAFE-HARVEST) Post-Mortem: Why A/B Slots Dropped Score to 80.865
+- **The Experiment**: 10-slot slow-row A/B test alternating `FRAME_TEMPLATE` vs `INJ_CLOSE_TEMPLATE`.
+- **Result**: **80.865** — Severe regression (-10.3 points).
+- **Root Cause**: `INJ_CLOSE_TEMPLATE` prefill text confused `gpt_oss`, lowering fire rate and inflating latency per slot. Alternating slots during early fill wasted budget on non-firing interactions.
+
+### A0.3. v20 (ORACLE) Post-Mortem: Why the Live Tournament Dropped Score to 86.070
 - **The Experiment**: v20 replaced v13's 1-sample latency classification with a 5-type × 3-rep
   live tournament (core / frame / bare / inject / deputy), selected by measured point-density
   with an 8% challenger margin, sized fills under a "separate search/replay budget" model, and
