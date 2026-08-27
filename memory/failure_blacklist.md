@@ -2,6 +2,18 @@
 
 This document records architectural patterns that definitively fail on the Kaggle evaluator. **Never repeat these patterns.**
 
+## 0. Type G: Multi-Predicate Slot Displacement (v26: 86.545)
+**Symptoms**: Score drops from 91.305 to 86.545.
+**Root Cause**: 2-hop deputy candidates (15s latency) yield 22 raw points, but evict ~1.8 single-post candidates (32.4 raw points lost), causing a severe net loss.
+**Fix**: Keep candidates strictly single-hop (`BURST_K = 1`, `SLOW_MULTIPOST_N = 1`).
+
+## 0.1 Type H: Domain Generator Formatting Alteration (v25: 86.215)
+**Symptoms**: Score drops from 91.305 to 86.215.
+**Root Cause**: Changing `_url(i)` formatting degrades model instruction matching/fire rate.
+**Fix**: Keep `_url(i)` formatting byte-exact: `http://{_label(i)}.co`.
+
+---
+
 ## 0. Type F: Stop-Rule Latency Contamination & Unverified Prefill Noise (v20, v21)
 **Symptoms**: Score drops to 86.070 (v20) or 80.865 (v21).
 **Root Cause**: Updating `slowest` with experimental probe latencies inflates `slowest * 1.10`, cutting off fill early. Also, unverified prefill text (`INJ_CLOSE`) confuses `gpt_oss`.

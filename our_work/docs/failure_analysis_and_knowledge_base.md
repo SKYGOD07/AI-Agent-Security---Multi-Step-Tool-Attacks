@@ -44,6 +44,11 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v51 (OMEGA v21)** | `80.865` | Severe Regression (-10.305) | Slow-Row A/B Slots | `INJ_CLOSE_TEMPLATE` prefill text confused `gpt_oss`, lowering fire rate and inflating latency. |
 | **v52 (OMEGA v22)** | **`91.305`** | **🏆 NEW PEAK SCORE** | **Two-Phase Backfill Sizing** | Recovered idle window (Primary 0.945 + Backfill 0.995/0.997). Added +3-5 cands cleanly! |
 | **v53 (OMEGA v23)** | **`91.125`** | **Near-Peak** | **Trident 3-Depth Tournament** | 3-depth slow-row tournament over v22 backfill; fallback safely retained FRAME_TEMPLATE. |
+| **v54 (OMEGA v24)** | `85.275` | Severe Regression (-6.030) | Quad Density Tournament | 4-way tournament probe overhead + multi-candidate density switching reduced yield. |
+| **v55 (OMEGA v25)** | `86.215` | Regression (-5.090) | Token-Frugal Domains | Altering domain format (`_url(i)`) slightly degraded fire rate on `gemma`. |
+| **v56 (OMEGA v26)** | `86.545` | Regression (-4.760) | Target-Gated Deputy | Slot displacement loss: 2-hop deputy (15s) evicted ~1.8 single-post candidates (18s). |
+| **v57 (OMEGA v27)** | `89.280` | Near-Peak (-2.025) | Adaptive EMA Latency Sizing | Hard max generation guard stopped fill loop 2-3 candidates earlier than v22. |
+| **v58 (OMEGA v28)** | `89.055` | Near-Peak (-2.250) | Per-Row Sizing Asymmetry | Dropping 12.0s floor seed for `gemma` reacted aggressively to early fast samples, stopping early. |
 
 ---
 
