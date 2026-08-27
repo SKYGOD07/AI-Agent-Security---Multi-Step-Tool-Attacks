@@ -8,7 +8,7 @@ This master document synthesizes all failure post-mortems, breakthroughs, and ar
 ## 1. Master Score Trajectory
 
 ```
-v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650) -> v20 (86.070) -> v21 (80.865) -> v22 (91.305 PEAK🏆) -> v23 (91.125)
+v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650) -> v20 (86.070) -> v21 (80.865) -> v22 (91.305 PEAK🏆) -> v23 (91.125) -> v24 (85.275) -> v25 (86.215) -> v26 (86.545) -> v27 (89.280) -> v28 (89.055)
 ```
 
 ---
@@ -38,6 +38,31 @@ v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (8
   2. **Risk-Shaped Phasing**: Primary phase guaranteed a safe batch (~94.5% budget), while the backfill phase converted the trailing 5% idle window into ~3-5 additional high-quality candidates.
   3. **Preserved v13 Champions**: Retained byte-exact `TEMPLATE` & `FRAME_TEMPLATE` wording with latency-ascending submission ordering.
 - **Score Result**: **91.305** — New Repo Peak Benchmark! 🏆
+
+### A0.1. v28 (v58) Post-Mortem: Per-Row Sizing Asymmetry (Score: 89.055)
+- **The Experiment**: Per-row sizing asymmetry (dropping 12.0s floor seed for `gemma` and using `SLOWEST_MULT = 1.05`).
+- **Result**: **89.055** — Small regression (-2.25 pts vs v22).
+- **Root Cause**: Dropping the 12.0s floor seed for `gemma` caused early-fill stop estimates to react too aggressively to fast early samples. When candidate latencies slightly increased mid-fill, the tight 1.05 cushion triggered early fill loop termination.
+
+### A0.2. v27 (v57) Post-Mortem: Adaptive EMA Latency Sizing (Score: 89.280)
+- **The Experiment**: EMA latency smoothing (`slowest_ema = 0.2 * elapsed + 0.8 * slowest_ema`).
+- **Result**: **89.280** — Small regression (-2.025 pts vs v22).
+- **Root Cause**: While EMA smoothed over transient spikes, the hard max generation guard (`now + slowest_max * 1.05 >= wall_deadline`) triggered slightly earlier than v22's backfill phase, stopping the fill loop 2-3 candidates earlier.
+
+### A0.3. v26 (v56) Post-Mortem: Target-Gated Deputy Injection (Score: 86.545)
+- **The Experiment**: Multi-predicate deputy candidates (`DEPUTY_PERIOD = 7` → every 7th candidate) on the fast row (`gemma`).
+- **Result**: **86.545** — Moderate regression (-4.76 pts vs v22).
+- **Root Cause**: Slot displacement loss. Each 2-hop deputy took ~14–16s to execute instead of ~8.5s for a single post. The extra +4 raw point bonus (22 vs 18 raw) was far outweighed by the fact that each deputy evicted ~1.8 single-post candidates, net-losing points!
+
+### A0.4. v25 (v55) Post-Mortem: Token-Frugal Domains (Score: 86.215)
+- **The Experiment**: Replacing baseline domain generator (`_url(i)`) with 3-letter pure-alpha labels (`http://aab.co`).
+- **Result**: **86.215** — Moderate regression (-5.09 pts vs v22).
+- **Root Cause**: Replacing the baseline `_url(i)` domain formatting slightly altered string matching or tokenization behavior on `gemma`, causing a ~4-5% drop in candidate fire rate.
+
+### A0.5. v24 (v54) Post-Mortem: Quad Density Tournament (Score: 85.275)
+- **The Experiment**: Probing 4 candidate types (`frame`, `inject`, `prefill`, `deputy`) with a domain-scheme race.
+- **Result**: **85.275** — Severe regression (-6.03 pts vs v22).
+- **Root Cause**: Tournament probe overhead and multi-candidate density switching resulted in selecting sub-optimal templates on `gpt_oss` or `gemma`, dropping candidate yield by ~60 candidates.
 
 ### A0.1. v23 (TRIDENT) Post-Mortem: High Performance (Score: 91.125)
 - **The Experiment**: 3-depth slow-row Harmony tournament (`frame`, `inject`, `prefill`) over v22's two-phase backfill architecture.
