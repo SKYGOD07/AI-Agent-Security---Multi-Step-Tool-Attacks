@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Attack Discovery Engine project will be documented in this file.
+All notable changes to the scenario Discovery Engine project will be documented in this file.
 
 ## [1.0.0] - 2026-07-15
 

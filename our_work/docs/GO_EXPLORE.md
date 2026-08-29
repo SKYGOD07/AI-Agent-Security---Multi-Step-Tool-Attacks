@@ -20,5 +20,5 @@ Once the environment state is restored:
 3.  **Evaluate**: Extract the trace and calculate the state signature hash:
     *   If the hash is already in the `Archive`, update it only if the new path to this state is shorter.
     *   If the hash is new, mark the cell as **novel**, snapshot the new environment state, and add it to the `Archive` as a new exemplar.
-    *   If predicates (breaches) are triggered, save the prompt chain as a successful attack candidate.
+    *   If predicates (triggers) are triggered, save the prompt chain as a successful scenario candidate.
 4.  **Repeat**: Execute $K$ branch attempts (`branch_batch`) before selecting a new target cell from the archive.

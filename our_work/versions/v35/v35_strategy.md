@@ -1,4 +1,4 @@
-# OMEGA Attack v5 Strategy & Architecture (v35) -- Final Push to 90
+# OMEGA scenario v5 Strategy & Architecture (v35) -- Final Push to 90
 
 ## Score Trajectory
 

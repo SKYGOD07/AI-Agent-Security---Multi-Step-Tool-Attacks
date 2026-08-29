@@ -1,4 +1,4 @@
-# Project Roadmap: OMEGA Attack Discovery Engine (Updated Aug 2026)
+# Project Roadmap: OMEGA scenario Discovery Engine (Updated Aug 2026)
 
 This roadmap outlines the research and development phases for the OMEGA Attack Discovery Engine targeting the Kaggle **AI Agent Security — Multi-Step Tool Attacks** competition.
 
@@ -10,12 +10,12 @@ This roadmap outlines the research and development phases for the OMEGA Attack D
 
 ## Phase 2: Architecture Convergence & 90+ Score ✅ COMPLETE
 - [x] Port proven architecture from benchmark notebooks (v69, jedforce-1, 90.09).
-- [x] Build OMEGA Series attack engine (v31–v43).
+- [x] Build OMEGA Series discovery engine (v31–v43).
 - [x] Implement latency-split single-post fill with per-model template routing.
 - [x] Fix warm-up double-counting bug (OMEGA v5: 89.640).
 - [x] Prove that multi-post / multi-hop stacking causes regression (v7: 88.335, v12: 85.970).
 - [x] Prove that prompt termination omission causes runaway generation (v9: 86.355).
-- [x] **Breach 90.0 barrier with OMEGA v13: 91.170!** 🏆
+- [x] **trigger 90.0 barrier with OMEGA v13: 91.170!** 🏆
 
 ## Phase 3: High-Precision Incremental Optimization (CURRENT)
 - [x] `REPLAY_SAFE_FRAC = 0.994` (8946s cap, 54s safety cushion) → +3.2 candidates.

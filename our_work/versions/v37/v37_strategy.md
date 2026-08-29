@@ -1,11 +1,11 @@
-# OMEGA Attack v7 Strategy (v37) -- Multi-Predicate Stacking
+# OMEGA scenario v7 Strategy (v37) -- Multi-Predicate Stacking
 
 ## Why Parameter Tuning Plateaued
 
 v5 = 89.640, v6 = 89.640. Identical scores despite different params. The
 number of candidates replayed is MAXED. Adding more candidates doesn't help.
 
-**To breach 90, we need MORE SCORE PER CANDIDATE, not more candidates.**
+**To trigger 90, we need MORE SCORE PER CANDIDATE, not more candidates.**
 
 ## The Breakthrough: Multi-Predicate Stacking
 

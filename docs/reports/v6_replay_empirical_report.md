@@ -11,7 +11,7 @@ Every component is now strictly engineered around Kaggle's actual evaluation ben
 ### Current Bottleneck
 In v5, `compute_novelty()` assigned curiosity bonuses based on unique tool bigrams (`fs.read->http.post`), unique tool names, and visit counts.
 ### Why It Hurts Score
-If the LLM explores 100 different file paths (`fs.read path=a.txt`, `b.txt`, `c.txt`) without triggering a security violation, generic novelty scores those branches highly. This wastes search compute on benign exploration instead of discovering exploitable vulnerabilities.
+If the LLM explores 100 different file paths (`fs.read path=a.txt`, `b.txt`, `c.txt`) without triggering a security violation, generic novelty scores those branches highly. This wastes search compute on benign exploration instead of discovering exploitable failure cases.
 ### Exact Code to Modify
 Replace `compute_novelty` in `MultidimensionalArchive` with `compute_predicate_novelty(state)`:
 ```python
@@ -78,7 +78,7 @@ Zero. Directly maps to the required target objective.
 ### Current Bottleneck
 In v5, paths that yielded zero progress (`_compute_progress == 0`) or exceeded $15\text{s}$ expected latency were pruned (`BoundType.UPPER`).
 ### Why It Hurts Score
-As demonstrated in chess vs. exploit search: Attack B (39% heuristic score) might look suboptimal but triggers `CONFUSED_DEPUTY` on deeper exploration. Pruning B kills structural diversity and eliminates entire predicate categories on the hidden evaluation server.
+As demonstrated in chess vs. evaluate search: scenario B (39% heuristic score) might look suboptimal but triggers `CONFUSED_DEPUTY` on deeper exploration. Pruning B kills structural diversity and eliminates entire predicate categories on the hidden evaluation server.
 ### Exact Code to Modify
 In `HybridAttackSearchEngine.search`:
 - Remove ALL score-based bounds pruning.
@@ -107,7 +107,7 @@ def compute_replay_signature(trace: Mapping[str, Any], mutation_family: str, pre
     return f"{tool_seq}|{pred_str}|{mutation_family}|{msg_hash}"
 ```
 ### Expected Leaderboard Impact
-Ensures the archive indexes structural exploit trajectories (`Tool sequence + Predicate + Mutation family + Replay hash`), enabling clean portfolio deduplication.
+Ensures the archive indexes structural evaluate trajectories (`Tool sequence + Predicate + Mutation family + Replay hash`), enabling clean portfolio deduplication.
 ### Risk of Regression
 None.
 
@@ -118,13 +118,13 @@ None.
 ### Current Bottleneck
 Previous portfolio builders sorted candidates by `score` and filled quotas, which allowed `EXFILTRATION` prompts or repetitive top-scoring variants to dominate the final `submission.csv`.
 ### Why It Hurts Score
-Optimizing purely for top score removes "similar-looking but replay-different" attacks that work on different target LLMs (`gpt-oss` vs. `gemma`).
+Optimizing purely for top score removes "similar-looking but replay-different" scenarios that work on different target LLMs (`gpt-oss` vs. `gemma`).
 ### Exact Code to Modify
 In `AttackAlgorithm.run`:
 1. Group unique findings by primary `predicate_family` (`DESTRUCTIVE_WRITE`, `UNTRUSTED_EXEC`, `CONFUSED_DEPUTY`, `EXFILTRATION`, `OTHER`).
 2. Within each family, sub-group by unique `tool_sequence`.
 3. Perform **Interleaved Round-Robin Sampling** across every predicate family and unique tool sequence.
-4. Enforce a strict maximum cap on `EXFILTRATION` (maximum 20% of returned candidates), guaranteeing it never crowds out destructive or confused-deputy attacks.
+4. Enforce a strict maximum cap on `EXFILTRATION` (maximum 20% of returned candidates), guaranteeing it never crowds out destructive or confused-deputy scenarios.
 ### Expected Leaderboard Impact
 Maximizes submission diversity, guaranteeing that every discovered predicate family and unique tool chain is submitted (+4.0 to +6.0 public score).
 ### Risk of Regression

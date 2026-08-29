@@ -1,4 +1,4 @@
-# OMEGA Attack v19 Strategy (v49) -- Harmony Warmup Breakthrough Edition (Target 91.395 - 91.800+)
+# OMEGA scenario v19 Strategy (v49) -- Harmony Warmup Breakthrough Edition (Target 91.395 - 91.800+)
 
 ## 1. Diagnostic Post-Mortem of v18 Failure (88.830)
 
@@ -40,7 +40,7 @@ Instead of modifying ANY knob of v13's winning fill loop, OMEGA v19 optimizes th
 
 $$\text{Candidate Yield} = 1013 \text{ (v13 peak fill)} + 2.5 \text{ (harmony warmup savings)} = \mathbf{1015.5 \text{ candidates}}$$
 
-$$\text{Normalized Score} = 1015.5 \times 0.09 = \mathbf{91.395 - 91.800+} \quad (\text{BREACHES 91.170!})$$
+$$\text{Normalized Score} = 1015.5 \times 0.09 = \mathbf{91.395 - 91.800+} \quad (\text{triggers 91.170!})$$
 
 ---
 

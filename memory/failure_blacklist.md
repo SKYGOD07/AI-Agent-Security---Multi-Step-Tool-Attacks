@@ -23,7 +23,7 @@ This document records architectural patterns that definitively fail on the Kaggl
 
 ## 1. Type A: Notebook Execution Exceptions
 **Symptoms**: Kaggle returns `Notebook Threw Exception` immediately upon submission. **[VERIFIED]**
-**Root Cause**: Attempting to execute the attack logic, load the local SDK, or evaluate predicates inside a notebook cell before the official Kaggle evaluation server takes over. **[VERIFIED]**
+**Root Cause**: Attempting to execute the scenario logic, load the local SDK, or evaluate predicates inside a notebook cell before the official Kaggle evaluation server takes over. **[VERIFIED]**
 **Fix**: Use the 3-cell Base64 scaffold. Write `attack.py` to disk via base64 decoding. Gate all execution behind `os.getenv("KAGGLE_IS_COMPETITION_RERUN")`. **[VERIFIED]**
 
 ## 2. Type B: Gateway / Replay Timeout Overruns

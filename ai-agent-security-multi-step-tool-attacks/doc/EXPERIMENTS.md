@@ -1,6 +1,6 @@
 # Experiments and Calibration Log
 
-This file records local execution scores, timing profiles, and parameter calibrations for the Attack Discovery Engine.
+This file records local execution scores, timing profiles, and parameter calibrations for the scenario Discovery Engine.
 
 ## Baseline Run Logs
 
@@ -15,7 +15,7 @@ This file records local execution scores, timing profiles, and parameter calibra
 
 ## Observations
 
-1.  **Static Portfolio** is extremely robust under time pressure, yielding a high baseline score because all 400 slots are filled with valid post attacks. However, it does not discover new agent vulnerabilities.
+1.  **Static Portfolio** is extremely robust under time pressure, yielding a high baseline score because all 400 slots are filled with valid post scenarios. However, it does not discover new agent failure cases.
 2.  **Go-Explore** systematically traverses deeper paths, discovering nested file reads (`fs.read` on `secret.txt` inside subfolders) that static queries cannot predict.
-3.  **Heuristic Search** is fast at finding basic breaches but frequently gets stuck in local loops, generating duplicate traces for minor prompt variations.
+3.  **Heuristic Search** is fast at finding basic triggers but frequently gets stuck in local loops, generating duplicate traces for minor prompt variations.
 4.  **Novelty Search** exhibits the highest diversity in tool sequences, but requires more time to filter out non-vulnerable branches.

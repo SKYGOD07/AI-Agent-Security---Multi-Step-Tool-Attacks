@@ -1,6 +1,6 @@
-# v10 Attack Implementation
+# v10 scenario Implementation
 
-This is the v10 implementation of the multi-step tool attack for the AI Agent Security Kaggle Competition.
+This is the v10 implementation of the multi-step tool-use scenario for the AI Agent Security Kaggle Competition.
 
 ## Strategy
 

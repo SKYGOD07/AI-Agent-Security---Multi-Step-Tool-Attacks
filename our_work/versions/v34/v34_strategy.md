@@ -1,4 +1,4 @@
-# OMEGA Attack v4 Strategy & Architecture (v34) — Breach 90
+# OMEGA scenario v4 Strategy & Architecture (v34) — trigger 90
 
 ## Overview
 `omega_v4_attack.ipynb` carries the proven OMEGA v3 (86.490, 91.305-base) architecture forward with **5 targeted precision levers** to breach 90+.

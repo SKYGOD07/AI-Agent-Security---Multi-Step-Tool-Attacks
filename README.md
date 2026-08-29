@@ -1,5 +1,5 @@
 # AI Agent Security - Multi-Step Tool Attacks
-## Red-Team Discovery Engine & Kaggle Competition Architecture — OMEGA v22 Peak: 91.305 🏆
+## Candidate Discovery Engine & Kaggle Competition Architecture — OMEGA v22 Peak: 91.305 🏆
 
 This repository contains the full research, engineering, and submission pipeline for the Kaggle competition **"AI Agent Security - Multi-Step Tool Attacks"**.
 
@@ -10,7 +10,7 @@ This repository contains the full research, engineering, and submission pipeline
 - 📚 **[our_work/docs/failure_analysis_and_knowledge_base.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/our_work/docs/failure_analysis_and_knowledge_base.md)**: Complete version progression & failure taxonomy (v4–v53).
 - 📐 **[docs/SCORING_AND_EVALUATION.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/docs/SCORING_AND_EVALUATION.md)**: Mathematical scoring specification.
 - 📖 **[MASTER_AI_HANDOFF_THESIS.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/MASTER_AI_HANDOFF_THESIS.md)**: Comprehensive handoff thesis for successor AI models.
-- 🛑 **[projects/.../skills/failure_blacklist.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/projects/AI-Agent-Security---Multi-Step-Tool-Attacks/skills/failure_blacklist.md)**: Permanent failure rules.
+- 🛑 **[projects/.../skills/failure_blacklist.md](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/projects/AI-Agent-Security---Multi-Step-Tool-scenarios/skills/failure_blacklist.md)**: Permanent failure rules.
 
 ---
 

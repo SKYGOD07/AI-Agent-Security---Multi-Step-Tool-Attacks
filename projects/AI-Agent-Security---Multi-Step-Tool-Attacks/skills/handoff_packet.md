@@ -1,4 +1,4 @@
-# Handoff Packet: Red-Team AI Agent Security Engine (Updated Aug 2026)
+# Handoff Packet: evaluation AI Agent Security Engine (Updated Aug 2026)
 
 > **IMPORTANT**: The primary comprehensive handoff and failure analysis documents are:
 >
@@ -9,5 +9,5 @@
 - **Current Version**: `omega_v13_attack.ipynb` (v43) — **Peak Public Score: 91.170**
 - **Key Architecture**: Latency-Split Single-Post Validation-Fill with high-precision replay-safe sizing.
 - **Key Parameters**: `REPLAY_SAFE_FRAC = 0.994`, `SLOWEST_MULT = 1.10`, `SPLIT_CLASSIFY_N = 1`, `SLOWEST0 = 12.0`.
-- **Scaffolding**: Base64 attack encoding + defensive `try/except` imports + defensive `__init__` (Zero Format Error Guarantee).
+- **Scaffolding**: Base64 scenario encoding + defensive `try/except` imports + defensive `__init__` (Zero Format Error Guarantee).
 - **Build Command**: `python our_work/versions/v43/build_v43.py`

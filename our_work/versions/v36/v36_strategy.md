@@ -1,4 +1,4 @@
-# OMEGA Attack v6 Strategy & Architecture (v36) -- Breach 90
+# OMEGA scenario v6 Strategy & Architecture (v36) -- trigger 90
 
 ## Score Trajectory
 

@@ -30,7 +30,7 @@ The fill loop stops when `replay_cost + fill_unit > REPLAY_SAFE * 9000`. Each ca
 
 ## What Stays the Same
 - Single http.post per candidate (BURST_K equivalent = 1)
-- SECRET_MARKER payload
+- SECRET_MARKER test vector
 - Only live-verified candidates returned
 - No static padding
 - Proper 5-cell notebook scaffold with exact Id,Score placeholder

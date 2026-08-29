@@ -1,4 +1,4 @@
-# OMEGA Attack v8 Strategy (v38) -- Clean Recovery
+# OMEGA scenario v8 Strategy (v38) -- Clean Recovery
 
 ## Background & v7 Post-Mortem
 

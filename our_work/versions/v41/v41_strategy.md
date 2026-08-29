@@ -1,8 +1,8 @@
-# OMEGA Attack v11 Strategy (v41) -- Ultimate Goal Edition (Breaching 90.0+)
+# OMEGA scenario v11 Strategy (v41) -- Ultimate Goal Edition (triggering 90.0+)
 
 ## Strategy & Mathematical Yield Analysis
 
-OMEGA v11 is specifically engineered to breach the **90.0+ / 91.5+** score ceiling by optimizing candidate yield across both evaluated models while maintaining a 100% execution success rate on Kaggle.
+OMEGA v11 is specifically engineered to trigger the **90.0+ / 91.5+** score ceiling by optimizing candidate yield across both evaluated models while maintaining a 100% execution success rate on Kaggle.
 
 ### Candidate Yield Gains Over v5 (89.640 Base)
 
@@ -33,7 +33,7 @@ $$\text{Candidates} = 996 \text{ (v5 base)} + 3.3 + 2 + 2 = 1003.3 \text{ candid
 
 $$\text{Raw Score} = 1003.3 \times 18 \text{ (EXFIL + unique cell)} = 18,059.4 \text{ raw points}$$
 
-$$\text{Normalized Score} = \left(\frac{18,059.4}{200,000}\right) \times 1000 = \mathbf{90.297+} \quad \text{(BREACHES 90.0!)}$$
+$$\text{Normalized Score} = \left(\frac{18,059.4}{200,000}\right) \times 1000 = \mathbf{90.297+} \quad \text{(triggers 90.0!)}$$
 
 ---
 
@@ -45,7 +45,7 @@ $$\text{Normalized Score} = \left(\frac{18,059.4}{200,000}\right) \times 1000 = 
 | v8 | **89.145** | Clean recovery release | Succeeded |
 | v9 | 86.355 | Lean frame without termination prompt | Evaluated |
 | v10 | Running | Explicit termination + `HARD_N_CAP=1200` | Running |
-| **v11** | **90.300+** | **`FRAC=0.991`, `N=2`, `MULT=1.15` (Breach-90 Goal)** | **Ready for Submission** |
+| **v11** | **90.300+** | **`FRAC=0.991`, `N=2`, `MULT=1.15` (trigger-90 Goal)** | **Ready for Submission** |
 
 ---
 

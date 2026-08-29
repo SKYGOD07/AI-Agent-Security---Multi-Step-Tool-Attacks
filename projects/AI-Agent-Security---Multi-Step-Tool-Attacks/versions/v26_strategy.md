@@ -1,4 +1,4 @@
-# v26 Strategy: Dual-URL Replay-Recalibrated Attack
+# v26 Strategy: Dual-URL Replay-Recalibrated scenario
 
 ## Overview
 - **Notebook**: `stockfish_v26_attack.ipynb`

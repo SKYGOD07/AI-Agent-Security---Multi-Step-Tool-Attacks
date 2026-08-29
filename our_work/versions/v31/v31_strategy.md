@@ -1,4 +1,4 @@
-# OMEGA Attack v1 Strategy & Architecture (v31)
+# OMEGA scenario v1 Strategy & Architecture (v31)
 
 ## Overview
 `omega_v1_attack.ipynb` (built via `our_work/versions/v31/build_v31.py` from `omega_attack.py`) is an entirely new, ground-up attack algorithm engineered to surpass the 90.090 score benchmark by breaking out of single-predicate limitations.

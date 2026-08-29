@@ -96,7 +96,7 @@ OPENAI AI AGENT CYBERSEC/
 │   ├── handoff_packet.md             # Quick-start handoff reference
 │   ├── strategy_library.md           # Verified tactics & blacklisted patterns
 │   └── failure_blacklist.md          # Failure type taxonomy
-├── projects/AI-Agent-Security---Multi-Step-Tool-Attacks/
+├── projects/AI-Agent-Security---Multi-Step-Tool-scenarios/
 │   └── skills/
 │       ├── failure_blacklist.md      # Permanent failure memory
 │       └── handoff_packet.md         # Skill handoff pointer

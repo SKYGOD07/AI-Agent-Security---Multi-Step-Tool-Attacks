@@ -14,14 +14,14 @@ Go-Explore separates exploration into two distinct steps:
 2.  **Explore (Branching)**: Restore the environment to the exemplar's checkpoint. Apply mutation operators to branch. If the branch yields a state with an unseen signature hash, it is snapshotted and archived.
 
 ### 2. Heuristic Search
-Heuristic search acts as a best-first exploitation search:
-*   Maintains a priority queue of paths sorted by their heuristic score (threat severity + tool execution counters).
+Heuristic search acts as a best-first optimization search:
+*   Maintains a priority queue of paths sorted by their heuristic score (behavior severity + tool execution counters).
 *   Always expands the highest-performing path.
 *   Ideal for quickly exploiting vulnerable agent behaviors when the state space is narrow.
 
 ### 3. Novelty Search
 Novelty search is a coverage-driven exploration strategy:
-*   Ignores threat predicate scores.
+*   Ignores behavior predicate scores.
 *   Prioritizes expanding paths that lead to unseen cell signatures.
 *   Discovers hidden tool flows and triggers secondary guardrails by maximizing path variety.
 

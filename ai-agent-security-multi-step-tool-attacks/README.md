@@ -1,12 +1,12 @@
-# Attack Discovery Engine: Algorithmic Search for Multi-Step Tool Attacks
+# scenario Discovery Engine: Algorithmic Search for Multi-Step Tool-Use Scenarios
 
-This repository contains a modular, state-of-the-art **Attack Discovery Engine** for the Multi-Step Tool Attacks competition. Rather than relying on static prompt engineering, this engine treats attack candidate discovery as a time-bounded search problem across the environment's state-space, heavily inspired by the search tree optimizations of **Stockfish**.
+This repository contains a modular, state-of-the-art **scenario Discovery Engine** for the Multi-Step Tool-Use Scenarios competition. Rather than relying on static prompt engineering, this engine treats scenario candidate discovery as a time-bounded search problem across the environment's state-space, heavily inspired by the search tree optimizations of **Stockfish**.
 
 ---
 
 ## 📊 Score Dashboard
 
-Here are the results of our attack portfolios:
+Here are the results of our strategy portfolios:
 
 | Model / Configuration | Normalized Score | Description |
 |---|---|---|

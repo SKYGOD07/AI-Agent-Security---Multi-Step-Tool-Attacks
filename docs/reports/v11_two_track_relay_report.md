@@ -1,4 +1,4 @@
-# Stockfish Attack Engine v11: Two-Track Relay Optimizer (Model-Behavior Routing + Thin Stockfish Control)
+# Stockfish discovery engine v11: Two-Track Relay Optimizer (Model-Behavior Routing + Thin Stockfish Control)
 
 ## 1. Executive Summary & Diagnosis: Why v7 Worked Best & Why v8/v9 Regressed
 
@@ -47,7 +47,7 @@ Inspection of the decoded `JEDFORCE` submission reveals three concrete mechanics
 |  [ AGGRESSIVE MODE (`gpt_oss`-like) ]     [ STABLE MODE (`gemma`-like) ]          |
 |  inj_rate >= 0.3 or inj_fires > clean     Clean plain/bare converts better        |
 |  Prioritizes inj_close / inj_commentary   Prioritizes plain / bare / bare_ok      |
-|  High-severity system & file payloads     Balanced round-robin tool payloads      |
+|  High-severity system & file test vectors     Balanced round-robin tool test vectors      |
 +-----------------------------------------------------------------------------------+
                                           |
                                           v

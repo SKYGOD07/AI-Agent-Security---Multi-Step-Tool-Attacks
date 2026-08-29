@@ -1,11 +1,11 @@
-# Stockfish Attack Engine v7: Replay-Throughput Optimizer (RELAY PUSH100 Design)
+# Stockfish discovery engine v7: Replay-Throughput Optimizer (RELAY PUSH100 Design)
 
 ## Executive Summary & Diagnosis of v5/v6 Regression
 
 In our previous iterations (`v5` score **77.895** vs `v4` score **78.930**, and the complex `v6` engine design), we identified a critical architectural trap: **overengineering search depth and pruning layers at the expense of empirical replay-safe candidate yield**.
 
 ### Why Complex Search Stacks Degrade Leaderboard Performance
-1. **Search Overhead Consumes Replay Budget**: Heavy simulation layers (`AlphaZeroPUCTOrdering` over multi-hop chains, upper-bound pruning, Thompson sampling samplers, and multi-dimensional archives) burn compute and real-time seconds just deciding *what* to try, leaving less time/budget for generating and returning clean, validated attack traces.
+1. **Search Overhead Consumes Replay Budget**: Heavy simulation layers (`AlphaZeroPUCTOrdering` over multi-hop chains, upper-bound pruning, Thompson sampling samplers, and multi-dimensional archives) burn compute and real-time seconds just deciding *what* to try, leaving less time/budget for generating and returning clean, validated scenario traces.
 2. **Artificial Quotas Suppress Winning Families**: In `v6`, a hard **20% exfiltration quota cap** (`max_exfil_quota = int(self.max_candidates * 0.20)`) was enforced under the assumption that non-exfiltration families needed guaranteed dominance. However, competition evaluation benchmarks (`GPT-OSS` and `Gemma 4`) heavily reward reliable conversion plus throughput. If the target model reliably falls to high-speed `inj_close` or `plain` template exfiltration, capping that family at 20% literally throws away 80% of our leaderboard capacity.
 3. **Unvalidated Search Heuristics vs. Real Replay Latency**: Estimating candidate replay cost via search-time heuristics often misjudges actual inference delay on target models.
 
@@ -25,7 +25,7 @@ Every phase is bound by real-time checks and cumulative replay budget monitoring
 ### 2. Proven Template Probing (`Point 2`)
 We retained only the **5 proven templates** (`plain`, `bare`, `bare_ok`, `inj_close`, `inj_commentary`) and probe each for exactly `PROBE_REPS = 5` iterations.
 - We require a minimum fire rate (`MIN_FIRE_RATE = 0.2`).
-- We measure `latencies` across all trials and isolate `successful_latencies` where the probe actually triggered an attack.
+- We measure `latencies` across all trials and isolate `successful_latencies` where the probe actually triggered an scenario.
 - We select the winning template using **empirical effective cost**:
   $$\text{Effective Cost} = \frac{\text{Median(Successful Probe Latencies)}}{\text{Fire Rate}}$$
   This mirrors `RELAY PUSH100` and guarantees that the engine selects the template providing the cheapest, most reliable conversion.
@@ -55,7 +55,7 @@ def compute_replay_signature(trace, mutation_family, predicate_family, prompt_te
     # Combines with predicate family, mutation operator, and prompt hash
     return f"{tool_seq}|{predicate_family}|{mutation_family}|{prompt_hash}"
 ```
-- **Collision Resolution (`Point 6`)**: When exact duplicate replay signatures occur, `ReplaySignatureArchive` compares them and keeps the **shorter candidate** (lower character count) or the one with **strictly lower measured replay latency**, ensuring optimal payload economy.
+- **Collision Resolution (`Point 6`)**: When exact duplicate replay signatures occur, `ReplaySignatureArchive` compares them and keeps the **shorter candidate** (lower character count) or the one with **strictly lower measured replay latency**, ensuring optimal test vector economy.
 
 ### 7. Strict Portfolio Construction Order (`Point 7`)
 Our final output portfolio is assembled in strict hierarchy:

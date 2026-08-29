@@ -66,7 +66,7 @@ $$\text{Normalized Score} = 1015.1 \times 0.09 = \mathbf{91.359 - 91.800+} \quad
 ### Component: Version 47 (`our_work/versions/v47/`)
 
 #### [NEW] [omega_v17_attack.py](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/our_work/versions/v47/omega_v17_attack.py)
-Implementation of OMEGA v17 attack algorithm featuring restored 100% v13 baseline (`PROBE_HOPS=0`, `COEF=1.0`, exact prompt wording) + precision tuning (`FRAC=0.995`, `MULT=1.09`).
+Implementation of OMEGA v17 discovery algorithms featuring restored 100% v13 baseline (`PROBE_HOPS=0`, `COEF=1.0`, exact prompt wording) + precision tuning (`FRAC=0.995`, `MULT=1.09`).
 
 #### [NEW] [build_v47.py](file:///c:/OPENAI%20AI%20AGENT%20CYBERSEC/our_work/versions/v47/build_v47.py)
 Generator script with 22-point validation suite.

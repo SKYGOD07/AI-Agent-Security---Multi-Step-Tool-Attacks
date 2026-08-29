@@ -1,18 +1,18 @@
-# Stockfish Attack Engine v9: Adaptive Replay-Portfolio Optimizer (Online UCB/Thompson Sampling Allocator & Marginal Gain Selection)
+# Stockfish discovery engine v9: Adaptive Replay-Portfolio Optimizer (Online UCB/Thompson Sampling Allocator & Marginal Gain Selection)
 
 ## 1. Executive Summary & The Bottleneck Blocking 110+ Score
 
 In `v8`, we introduced 4 distinct predicate families (`EXFILTRATION`, `UNTRUSTED_TO_ACTION`, `DESTRUCTIVE_WRITE`, `CONFUSED_DEPUTY`) along with a heuristic static **Family Pivot Rule** (`if 3 consecutive attempts yield no new signature, skip to next family`). While `v8` successfully eliminated mono-family `http.post` saturation and recovered performance into the mid-80s band, it plateaued because **its family allocation strategy remained static and heuristic rather than adaptive and online**.
 
 ### Why Heuristic Stop/Go Rules Cap Score in the Mid-80s
-- **Heterogeneous Target Refusal Surfaces**: When evaluated across diverse benchmark models (`GPT-OSS` vs `Gemma 4`), each model exhibits drastically different vulnerability profiles. A static rule (`try 3 times, then pivot`) wastes compute grinding against rigid refusal boundaries on one model while under-allocating compute to highly yielding arms on another.
+- **Heterogeneous Target Refusal Surfaces**: When evaluated across diverse benchmark models (`GPT-OSS` vs `Gemma 4`), each model exhibits drastically different failure case profiles. A static rule (`try 3 times, then pivot`) wastes compute grinding against rigid refusal boundaries on one model while under-allocating compute to highly yielding arms on another.
 - **Generic Novelty vs. Marginal Leaderboard Yield**: Without explicitly scoring candidate branches by their net contribution to the competition objective (`severity + unique signature diversity - measured replay cost - duplicate penalty`), static generators inevitably collect redundant or high-latency branches.
 
 ---
 
 ## 2. v9 Architectural Transformation: Online Bandit Allocator & Pareto Portfolio
 
-`v9` transforms the attack engine from a static procedural loop into an **Online Multi-Armed Bandit Replay-Portfolio Optimizer**:
+`v9` transforms the discovery engine from a static procedural loop into an **Online Multi-Armed Bandit Replay-Portfolio Optimizer**:
 
 ### Innovation A: Adaptive Family Allocator (`Thompson Sampling / Beta Distributions`)
 Each of the 4 predicate families is treated as a distinct bandit arm:
@@ -44,7 +44,7 @@ Instead of global tree search, `ThinStockfishController` maintains a small live 
 
 | Architectural Dimension | v8 (`Replay-Throughput Controller`) | v9 (`Adaptive Replay-Portfolio Optimizer`) |
 | :--- | :--- | :--- |
-| **Family Allocation (`Point 1`)** | Heuristic static round-robin with `PIVOT_LIMIT = 3` stop/go counter. | **Online Multi-Armed Bandit** (`Thompson Sampling Beta distributions`), sampling `allocator.select_arm()` to continuously adapt to target vulnerability profiles. |
+| **Family Allocation (`Point 1`)** | Heuristic static round-robin with `PIVOT_LIMIT = 3` stop/go counter. | **Online Multi-Armed Bandit** (`Thompson Sampling Beta distributions`), sampling `allocator.select_arm()` to continuously adapt to target failure case profiles. |
 | **Candidate Valuation (`Point 4`)** | Static violation count + basic family bonus. | **Marginal Leaderboard Gain per Second**: $\frac{\text{new\_sig}(30) + \text{new\_fam}(50) + \text{severity} - \text{cost} - \text{dup}}{\text{latency}}$. |
 | **Portfolio Retention (`Point 5`)** | Basic shorter-prompt replacement. | **Compact Pareto Set (`ParetoPortfolioArchive`)**: Retains only entries improving unique coverage, severity, or replay efficiency. Prunes strictly dominated items. |
 | **Exploration Structure (`Point 7`)** | Global top-16 archive mutations. | **Small Beams per Family (`top 3 live branches`)**: Local beam expansion that decays arm weight automatically if the beam fails to improve. |

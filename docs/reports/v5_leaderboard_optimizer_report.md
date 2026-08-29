@@ -30,7 +30,7 @@ The competition score is driven by triggering unique, high-severity predicate vi
 ## 2. Breakthrough Family Discovery & Diminishing Exfiltration Rewards (`TraceEvaluator`)
 
 ### The Problem in v4
-The evaluation function assigned $+35.0 \times \text{severity}$ for any predicate string not previously seen, and $+16.0 \times \text{severity}$ for repeats. Because exfiltration prompts can generate dozens of distinct URLs or minor payload strings, the search engine often mistook repetitive exfiltration variants for "novel" high-reward discoveries.
+The evaluation function assigned $+35.0 \times \text{severity}$ for any predicate string not previously seen, and $+16.0 \times \text{severity}$ for repeats. Because exfiltration prompts can generate dozens of distinct URLs or minor test vector strings, the search engine often mistook repetitive exfiltration variants for "novel" high-reward discoveries.
 
 ### The v5 Algorithmic Fix
 We restructured `TraceEvaluator.evaluate()` (`lines 430-475`) into a tiered reward hierarchy:
@@ -50,7 +50,7 @@ else:
 Furthermore, when `archive.add(new_state)` confirms that a state unlocked a brand new family (`unlocked_family == True`), we add an immediate **$+100.0$ structural curiosity bonus** and **double our genetic prompt mutation variants ($n_{\text{evolve}}=4$)** around that exact frontier boundary (`lines 895-905`).
 
 ### Exact Reason for Score Improvement
-This aligns the internal MCTS/PUCT Q-values directly with leaderboard economics. By assigning a massive $+150.0 \times \text{severity}$ reward for opening a new predicate family and crushing repeated exfiltration loops down to $3.0$, AlphaZero move ordering automatically prunes exfil loops and prioritizes prompt chains that exploit destructive actions and confused deputy patterns.
+This aligns the internal MCTS/PUCT Q-values directly with leaderboard economics. By assigning a massive $+150.0 \times \text{severity}$ reward for opening a new predicate family and crushing repeated exfiltration loops down to $3.0$, AlphaZero move ordering automatically prunes exfil loops and prioritizes prompt chains that evaluate destructive actions and confused deputy patterns.
 
 ---
 
@@ -69,7 +69,7 @@ else:
 ```
 
 ### Exact Reason for Score Improvement
-If two candidate prompts achieve the same predicate violation, the shorter, faster prompt ($1.5\text{s}$) is vastly superior to the slow multi-hop prompt ($8.0\text{s}$) because it leaves more replay budget available for other unique attacks. By penalizing latency super-linearly ($>4.0\text{s}$), the search engine selects concise, high-speed jailbreaks that maximize **Points per Replay Second**.
+If two candidate prompts achieve the same predicate violation, the shorter, faster prompt ($1.5\text{s}$) is vastly superior to the slow multi-hop prompt ($8.0\text{s}$) because it leaves more replay budget available for other unique scenarios. By penalizing latency super-linearly ($>4.0\text{s}$), the search engine selects concise, high-speed jailbreaks that maximize **Points per Replay Second**.
 
 ---
 
@@ -127,7 +127,7 @@ _add_from_bucket("CONFUSED_DEPUTY", quota_limit=140)    # ~20%
 _add_from_bucket("EXFILTRATION", quota_limit=150)       # ~20%
 _add_from_bucket("OTHER", quota_limit=80)               # ~10%
 ```
-Only after all unique non-exfil attacks and unique exfil trajectories have been safely banked below `REPLAY_SAFE * REPLAY_BUDGET_S` ($8,460\text{s}$) does the engine perform template padding.
+Only after all unique non-exfil scenarios and unique exfil trajectories have been safely banked below `REPLAY_SAFE * REPLAY_BUDGET_S` ($8,460\text{s}$) does the engine perform template padding.
 
 ### Exact Reason for Score Improvement
 This stratification ensures that the submitted candidate list is balanced across every evaluation category of the Kaggle benchmark, capturing the maximum possible unique predicate class points across `gpt-oss` and `gemma` models.

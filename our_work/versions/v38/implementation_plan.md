@@ -41,7 +41,7 @@ candidates = 18,000 / 18 = 1,000
 Need: +4 more successful replays
 ```
 
-We need **JUST 4 MORE CANDIDATES** to breach 90. The fill produces ~1043. The replay scores ~996. The gap is ~47 candidates lost to replay fire-rate variance (~95.5% replay success rate).
+We need **JUST 4 MORE CANDIDATES** to trigger 90. The fill produces ~1043. The replay scores ~996. The gap is ~47 candidates lost to replay fire-rate variance (~95.5% replay success rate).
 
 ---
 

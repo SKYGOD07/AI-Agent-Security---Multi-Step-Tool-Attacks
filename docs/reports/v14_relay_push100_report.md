@@ -1,4 +1,4 @@
-# Stockfish Attack Engine v14: RELAY PUSH100 / Replay-Safe Throughput Optimizer
+# Stockfish discovery engine v14: RELAY PUSH100 / Replay-Safe Throughput Optimizer
 
 ## 1. Root Cause Diagnosis of v12 & v13 Kaggle Failure / Low Performance
 

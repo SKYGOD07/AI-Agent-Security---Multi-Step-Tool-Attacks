@@ -1,4 +1,4 @@
-# OMEGA Attack v17 Strategy (v47) -- Precision Squeeze Successor Edition (Target 91.359 - 91.800+)
+# OMEGA scenario v17 Strategy (v47) -- Precision Squeeze Successor Edition (Target 91.359 - 91.800+)
 
 ## 1. Comprehensive Post-Mortem of v16 Failure (62.410)
 

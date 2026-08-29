@@ -1,4 +1,4 @@
-# OMEGA Attack v14 Strategy (v44) — Precision Squeeze Edition (Target 91.665+)
+# OMEGA scenario v14 Strategy (v44) — Precision Squeeze Edition (Target 91.665+)
 
 ## Builds on v13 Confirmed Peak: 91.170 🏆
 

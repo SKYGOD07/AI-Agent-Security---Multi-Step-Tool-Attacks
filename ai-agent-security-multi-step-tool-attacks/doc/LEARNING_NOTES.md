@@ -1,16 +1,16 @@
-# Learning Notes: Algorithmic Attack Discovery
+# Learning Notes: Algorithmic scenario Discovery
 
-Welcome! This document provides educational commentary on the algorithms, design invariants, and principles behind the Attack Discovery Engine.
+Welcome! This document provides educational commentary on the algorithms, design invariants, and principles behind the scenario Discovery Engine.
 
 ## Why Algorithmic Search Matters
 
 Prompt engineering (manually crafting prompts) is static and fragile. An AI agent's security guardrails change, system files shift, and LLM behaviors drift. 
 
-By treating vulnerability discovery as an **algorithmic search problem**, we build a system that:
+By treating failure case discovery as an **algorithmic search problem**, we build a system that:
 1.  Automatically probes the environment.
 2.  Discovers what tools are available and how they respond.
-3.  Synthesizes multi-step attack payloads dynamically.
-4.  Learns and updates its attack strategy based on trace feedback.
+3.  Synthesizes multi-step scenario test vectors dynamically.
+4.  Learns and updates its scenario strategy based on trace feedback.
 
 ## Key Design Patterns & Insights
 

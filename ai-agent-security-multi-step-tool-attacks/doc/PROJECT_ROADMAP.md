@@ -1,6 +1,6 @@
-# Project Roadmap: Attack Discovery Engine
+# Project Roadmap: scenario Discovery Engine
 
-This roadmap outlines the research and development phases planned for the Attack Discovery Engine.
+This roadmap outlines the research and development phases planned for the scenario Discovery Engine.
 
 ## Phase 1: Foundations & Baselining (Current)
 - [x] Establish modular codebase boundaries (`attack_discovery/`).
@@ -14,7 +14,7 @@ This roadmap outlines the research and development phases planned for the Attack
 - [ ] **Adaptive Branching**: Adjust branch batch sizing dynamically based on remaining timebox budget.
 
 ## Phase 3: Monte Carlo Tree Search (MCTS) (Medium-Term)
-- [ ] **State Tree Modeling**: Represent the attack search space as an explicit search tree instead of a flat archive.
+- [ ] **State Tree Modeling**: Represent the search space as an explicit search tree instead of a flat archive.
 - [ ] **UCT Selection**: Implement the Upper Confidence Bound applied to Trees (UCT) formula:
   $$\text{UCT} = \frac{W_i}{N_i} + c \sqrt{\frac{\ln N_p}{N_i}}$$
 - [ ] **Rollout Simulation**: Run lightweight rollout simulations using fast heuristic-driven model agents.

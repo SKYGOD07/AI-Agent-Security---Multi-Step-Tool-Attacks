@@ -30,4 +30,4 @@ This hash partitions the continuous state-space into discrete equivalence classe
 
 Our engine maintains two distinct cell signatures:
 *   **State Cell Signature**: Includes user intent hashes. This ensures that when the user inputs different prompts, they create different cells even if the agent produces the same tool sequence. This is optimized for Phase 2 exploration (Go-Explore).
-*   **Score Cell Signature**: Excludes user intent and egress details, focusing purely on tool call sequences. This matches the competition evaluator's scoring metric, preventing double-scoring of structurally identical attacks.
+*   **Score Cell Signature**: Excludes user intent and egress details, focusing purely on tool call sequences. This matches the competition evaluator's scoring metric, preventing double-scoring of structurally identical scenarios.

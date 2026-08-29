@@ -1,6 +1,6 @@
 # Comprehensive Failure Analysis & Knowledge Base (v4 – v43 / OMEGA Series — Peak: 91.170)
 
-This document synthesizes every version's design, empirical score, failure mode, and root cause across the competition trajectory. It serves as an authoritative reference for future AI agents working on the **AI Agent Security – Multi-Step Tool Attacks** Kaggle benchmark.
+This document synthesizes every version's design, empirical score, failure mode, and root cause across the competition trajectory. It serves as an authoritative reference for future AI agents working on the **AI Agent Security – Multi-Step Tool-Use Scenarios** Kaggle benchmark.
 
 ---
 
@@ -12,7 +12,7 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v5** | `77.895` | Succeeded | Template expansion | Added more prompt templates without latency filtering. |
 | **v7** | `84.240` | Succeeded | Replay-Throughput Loop | Probe → Select lowest effective cost → Seed fired probes → Fill. |
 | **v8** | `22.290` | Severe Regression | Heuristic Controller | High controller complexity & state overhead collapsed throughput. |
-| **v9** | `51.990` | Regression | Multi-Armed Bandits | Bandit exploration wasted time on low-yield attack families during search. |
+| **v9** | `51.990` | Regression | Multi-Armed Bandits | Bandit exploration wasted time on low-yield scenario families during search. |
 | **v11** | `23.175` | Severe Regression | Two-Track Router | Over-engineered heuristic router & signatures hurt replay throughput. |
 | **v12** | `N/A` | Notebook Exception | Search overhaul + local SDK import | Imported `SandboxEnv` inside notebook cell prior to evaluator launch. |
 | **v13** | `14.820` | Format Error | Replay signature archive | Overran time budget during search; leftover candidates exceeded window. |
@@ -34,7 +34,7 @@ This document synthesizes every version's design, empirical score, failure mode,
 | **v40 (OMEGA v10)** | `87.300` | Succeeded | Explicit Frame + Cap=1200 | Fixed runaway bug with explicit prompt, but `HARD_N_CAP=1200` capped score early. |
 | **v41 (OMEGA v11)** | `89.955` | Near-Peak | **v11 Incremental Tuning** | `FRAC=0.991`, `MULT=1.15`, `N=2`. Replayed 999.5 cands (0.045 from 90.000). |
 | **v42 (OMEGA v12)** | `85.970` | Regression (-3.985) | Multi-Post Harmony (`N=4`) | `_forge_plan_msg(idx, 4)` added per-candidate latency overhead on evaluator. |
-| **v43 (OMEGA v13)** | `91.170` | Succeeded | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. Breached 90+91! (89.685 on 2nd run). |
+| **v43 (OMEGA v13)** | `91.170` | Succeeded | **v11 Precision Increments** | `FRAC=0.994`, `MULT=1.10`, `N=1`, `SLOW0=12`. triggered 90+91! (89.685 on 2nd run). |
 | **v44 (OMEGA v14)** | `86.760` | Regression (-4.410) | Precision Squeeze | `COEF=0.97` under-estimated replay cost $\rightarrow$ replay budget overflow $\rightarrow$ candidates cut off. |
 | **v45 (OMEGA v15)** | `88.920` | Regression (-2.250) | Prompt Micro-Trim | Micro-trimmed prompt wording slightly degraded fire rate on `gemma`. |
 | **v46 (OMEGA v16)** | `62.410` | Severe Regression | Fast 1-Hop Probing | `PROBE_HOPS=1` under-estimated 8-hop replay cost by 50% $\rightarrow$ replay timeout at cand #693. |

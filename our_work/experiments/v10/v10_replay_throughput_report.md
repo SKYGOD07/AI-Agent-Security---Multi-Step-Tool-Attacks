@@ -1,7 +1,7 @@
 # v10 Replay Throughput Report
 
 ## Summary
-The v10 implementation replaces static family allocation with adaptive Multi-Armed Bandit (Thompson Sampling / UCB) based family allocation. It retains the JED-style prompt probing frontend to select the fastest reliable attack format but shifts all subsequent budget into dynamic replay-signature coverage.
+The v10 implementation replaces static family allocation with adaptive Multi-Armed Bandit (Thompson Sampling / UCB) based family allocation. It retains the JED-style prompt probing frontend to select the fastest reliable scenario format but shifts all subsequent budget into dynamic replay-signature coverage.
 
 ## Key Changes
 1. **Adaptive Family Allocator**: Predicts the best predicate family to probe using empirical marginal gains per second of runtime. Penalizes slow and repetitious branches.

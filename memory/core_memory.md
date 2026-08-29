@@ -1,7 +1,7 @@
 # Core Memory: AI Agent Security - Multi-Step Tool Attacks
 
 ## 1. Competition Mechanics & Scoring
-- **Objective**: Find multi-step attack paths that move an agent from untrusted inputs to unsafe actions. Return a compact portfolio of replayable candidates. **[VERIFIED]**
+- **Objective**: Find multi-step scenario paths that move an agent from untrusted inputs to unsafe actions. Return a compact portfolio of replayable candidates. **[VERIFIED]**
 - **Environment**: Deterministic offline benchmark. Kaggle independently replays the returned candidates in a fresh, isolated `SandboxEnv` against secret target models. **[VERIFIED]**
 - **Time Budget**: 9000 seconds (per model). **[VERIFIED]**
 - **Candidate Cap**: 2000 candidates maximum. **[VERIFIED]**

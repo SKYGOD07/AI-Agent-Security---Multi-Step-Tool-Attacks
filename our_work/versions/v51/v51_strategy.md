@@ -79,6 +79,6 @@ beats v13. This is the first version since v13 whose worst case is the champion 
 
 - v22 (if inject commits): promote winner per row from the start; consider re-running A/B
   mid-fill for drift; revisit DEPUTY as a *measured side-portfolio* only where its density wins.
-- v22 (if inject rejects): pure-margin release (drop A/B), then attack gemma-row throughput
+- v22 (if inject rejects): pure-margin release (drop A/B), then scenario gemma-row throughput
   via supply-side tricks that don't touch wording.
 - 130+: requires multi-predicate economics to flip positive (measured, not assumed).

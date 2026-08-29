@@ -1,4 +1,4 @@
-# OMEGA Attack v13 Strategy (v43) -- Incremental Goal Edition (Target 90.600 - 91.080+)
+# OMEGA scenario v13 Strategy (v43) -- Incremental Goal Edition (Target 90.600 - 91.080+)
 
 ## Evolution History & Benchmark Audit
 
@@ -41,7 +41,7 @@ OMEGA v13 builds directly on v11's peak architecture and applies 4 precision inc
 
 $$\text{Candidates} = 999.5 \text{ (v11 peak)} + 3.2 + 1.5 + 1.5 + 1.0 = \mathbf{1006.7 \text{ candidates}}$$
 
-$$\text{Normalized Score} = 1006.7 \times 0.09 = \mathbf{90.603+} \quad \text{(BREACHES 90.0!)}$$
+$$\text{Normalized Score} = 1006.7 \times 0.09 = \mathbf{90.603+} \quad \text{(triggers 90.0!)}$$
 
 ---
 
