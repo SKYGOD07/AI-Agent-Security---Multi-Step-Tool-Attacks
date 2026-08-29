@@ -8,7 +8,7 @@ This master document synthesizes all failure post-mortems, breakthroughs, and ar
 ## 1. Master Score Trajectory
 
 ```
-v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650) -> v20 (86.070) -> v21 (80.865) -> v22 (91.305 PEAK🏆) -> v23 (91.125) -> v24 (85.275) -> v25 (86.215) -> v26 (86.545) -> v27 (89.280) -> v28 (89.055)
+v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (89.145) -> v9 (86.355) -> v10 (87.300) -> v11 (89.955) -> v12 (85.970) -> v13 (91.170) -> v14 (86.760) -> v15 (88.920) -> v16 (62.410) -> v17 (88.695) -> v18 (88.830) -> v19 (88.650) -> v20 (86.070) -> v21 (80.865) -> v22 (91.305 PEAK🏆) -> v23 (91.125) -> v24 (85.275) -> v25 (86.215) -> v26 (86.545) -> v27 (89.280) -> v28 (89.055) -> v29 (32.005) -> v30 (84.465) -> v31 (90.450) -> v32 (48.740) -> v33 (64.440) -> v34 (74.790)
 ```
 
 ---
@@ -38,6 +38,31 @@ v3 (86.490) -> v4 (88.560) -> v5 (89.640) -> v6 (89.640) -> v7 (88.335) -> v8 (8
   2. **Risk-Shaped Phasing**: Primary phase guaranteed a safe batch (~94.5% budget), while the backfill phase converted the trailing 5% idle window into ~3-5 additional high-quality candidates.
   3. **Preserved v13 Champions**: Retained byte-exact `TEMPLATE` & `FRAME_TEMPLATE` wording with latency-ascending submission ordering.
 - **Score Result**: **91.305** — New Repo Peak Benchmark! 🏆
+
+### A0.1. v34 (v64) Post-Mortem: Triple-Phase Micro-Backfill (Score: 74.790)
+- **The Experiment**: Added a 3rd micro-backfill phase targeting `0.998` wall / `0.998` replay budget.
+- **Result**: **74.790** — Regression (-16.515 pts vs v22).
+- **Root Cause**: Squeezing into the extreme 0.2% edge of the 9000s budget caused replay container timeouts on Kaggle, triggering trailing candidate truncation.
+
+### A0.2. v32 (v62) Post-Mortem: MAXPACK Largest K=8 Burst (Score: 48.740)
+- **The Experiment**: Forcing large K bursts (K up to 8) per candidate.
+- **Result**: **48.740** — Catastrophic Failure (-42.565 pts vs v22).
+- **Root Cause**: Large K bursts destroyed model compliance on `gpt_oss` and `gemma`. Models either hallucinated, entered reasoning loops, or took 30+ seconds per candidate, causing massive submission truncation.
+
+### A0.3. v31 (v61) Success: TURBO Gemma Fast-Row Reseeding (Score: 90.450 🎯)
+- **The Innovation**: Single-post fill keeping byte-exact v22 templates, but reseeding `slowest` to the robust median of initial fast-row samples instead of pinning it at 12.0s.
+- **Result**: **90.450** — High-performing single-post baseline.
+- **Lesson**: Proves once again that **single-post exfiltration is the only reliable 90+ architecture**.
+
+### A0.4. v30 (v60) Post-Mortem: ADAPTIVE-K Multi-Post Calibrator (Score: 84.465)
+- **The Experiment**: Probing K in `{1,2,3,4}` during initial calibration to dynamically choose packing factor K.
+- **Result**: **84.465** — Moderate regression (-6.84 pts vs v22).
+- **Root Cause**: Probing multi-post K values on live target models wasted wall-clock budget and selected multi-post K > 1 on `gpt_oss`, where multi-post latency and non-compliance degraded throughput.
+
+### A0.5. v29 (v59) Post-Mortem: STACK-3 Fixed K=3 Multi-Post (Score: 32.005)
+- **The Experiment**: Packing 3 `http.post` calls into every candidate prompt.
+- **Result**: **32.005** — Catastrophic Failure (-59.3 pts vs v22).
+- **Root Cause**: Models on Kaggle failed to comply with multi-post instructions reliably. Multi-post execution time scaled non-linearly (30s+ per candidate), evicting ~70% of candidates during offline replay.
 
 ### A0.1. v28 (v58) Post-Mortem: Per-Row Sizing Asymmetry (Score: 89.055)
 - **The Experiment**: Per-row sizing asymmetry (dropping 12.0s floor seed for `gemma` and using `SLOWEST_MULT = 1.05`).

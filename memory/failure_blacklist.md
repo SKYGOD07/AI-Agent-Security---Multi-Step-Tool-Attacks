@@ -2,6 +2,13 @@
 
 This document records architectural patterns that definitively fail on the Kaggle evaluator. **Never repeat these patterns.**
 
+## 0. Type I: Multi-Post Packing Non-Compliance Collapse (v29: 32.005, v30: 84.465, v32: 48.740)
+**Symptoms**: Score collapses to 32.005 or 48.740.
+**Root Cause**: Packing multiple `http.post` calls (K=2..8) into one prompt destroys model compliance and inflates per-candidate execution time to 30s+, causing massive replay truncation.
+**Fix**: Keep `K = 1` strictly. Single-post exfiltration is the ONLY reliable 90+ architecture.
+
+---
+
 ## 0. Type G: Multi-Predicate Slot Displacement (v26: 86.545)
 **Symptoms**: Score drops from 91.305 to 86.545.
 **Root Cause**: 2-hop deputy candidates (15s latency) yield 22 raw points, but evict ~1.8 single-post candidates (32.4 raw points lost), causing a severe net loss.
