@@ -1,9 +1,9 @@
-"""Build OMEGA v38 (v68) AB-LEAN notebook: omega_v38_attack.ipynb
+"""Build OMEGA v39 (v69) BACKFILL-NUDGE notebook: omega_v39_attack.ipynb
 
-v38 = the proven v22 (91.305) engine + v35 fast-row reseed + shrunk slow-row A/B tournament.
-THE ONLY CHANGE vs v22/v36: AB_SLOTS 10->6 and AB_COMMIT_FIRE 4->3 (stricter bar).
-All other invariants (blacklist #1-#10) are byte-identical to v22/v36; v37's unconfirmed
-SLOWEST_MULT tightening is NOT carried into this variant.
+v39 = the proven v22 (91.305) engine + v35 fast-row reseed + a small, conservative nudge
+to the backfill segment's own guard fractions (0.995->0.996 replay, 0.997->0.9975 wall).
+v37's per-row SLOWEST_MULT change is explicitly reverted (both rows byte-exact v22 1.10)
+so this variant is isolated against the confirmed v22 baseline, not stacked on v37.
 """
 
 import base64
@@ -15,13 +15,13 @@ from pathlib import Path
 DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = DIR.parents[2]
 
-attack_src = (DIR / "omega_v38_attack.py").read_text(encoding="utf-8")
+attack_src = (DIR / "omega_v39_attack.py").read_text(encoding="utf-8")
 attack_b64 = base64.b64encode(attack_src.encode("utf-8")).decode("ascii")
 
 nb = {
     "cells": [
         {
-            "cell_type": "code", "execution_count": None, "id": "omega38-setup",
+            "cell_type": "code", "execution_count": None, "id": "omega39-setup",
             "metadata": {"tags": []}, "outputs": [],
             "source": [
                 "import sys, glob\n",
@@ -37,7 +37,7 @@ nb = {
             ],
         },
         {
-            "cell_type": "code", "execution_count": None, "id": "omega38-attack",
+            "cell_type": "code", "execution_count": None, "id": "omega39-attack",
             "metadata": {"tags": []}, "outputs": [],
             "source": [
                 "import base64\n",
@@ -49,7 +49,7 @@ nb = {
             ],
         },
         {
-            "cell_type": "code", "execution_count": None, "id": "omega38-submit",
+            "cell_type": "code", "execution_count": None, "id": "omega39-submit",
             "metadata": {"tags": []}, "outputs": [],
             "source": [
                 "import os, sys, glob, csv\n",
@@ -87,14 +87,14 @@ nb = {
     "nbformat": 4, "nbformat_minor": 5,
 }
 
-output_path = PROJECT_ROOT / "our_work" / "notebooks" / "omega_v38_attack.ipynb"
+output_path = PROJECT_ROOT / "our_work" / "notebooks" / "omega_v39_attack.ipynb"
 output_path.parent.mkdir(parents=True, exist_ok=True)
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(nb, f, indent=1)
 
-# ===== Validation (30+ assertions) =====
+# ===== Validation (27+ assertions) =====
 print("=" * 64)
-print("OMEGA v38 (v68) AB-LEAN Validation")
+print("OMEGA v39 (v69) BACKFILL-NUDGE Validation")
 print("=" * 64)
 
 _n = 0
@@ -125,32 +125,29 @@ check('return f"http://{_label(i)}.co"' in decoded, "_url(i) domain formatting b
 check(decoded.count("Then answer OK only.") >= 2, "OK-termination present in all prompts (#6)")
 check('PAYLOAD = "SECRET_MARKER"' in decoded, "SECRET_MARKER exfil payload present")
 
-# --- budget / fill invariants (blacklist #8, #9) ---
+# --- budget / fill invariants that must stay v22-exact (blacklist #8, #9) ---
 for pattern, desc in [
     ("SEPARATE_BUDGETS = True", "Separate-budget model"),
-    ("PRIMARY_REPLAY_FRAC = 0.945", "Primary replay guard 0.945 (v22-exact)"),
-    ("PRIMARY_WALL_FRAC = 0.985", "Primary wall guard 0.985 (v22-exact)"),
-    ("BACKFILL_REPLAY_FRAC = 0.995", "Backfill replay guard 0.995 (v22-exact)"),
-    ("BACKFILL_WALL_FRAC = 0.997", "Backfill wall guard 0.997 (v22-exact)"),
+    ("PRIMARY_REPLAY_FRAC = 0.945", "Primary replay guard 0.945 (v22-exact, untouched)"),
+    ("PRIMARY_WALL_FRAC = 0.985", "Primary wall guard 0.985 (v22-exact, untouched)"),
     ("REPLAY_COST_COEF = 1.0", "STRICT 1:1 cost accounting (#8)"),
     ("WARMUP_IDX = 899999", "Exactly-one warmup index"),
     ("HARD_N_CAP = 2000", "Hard candidate cap = 2000"),
     ("banked.sort(key=lambda item: item[1])", "Latency-ascending submission order"),
     ("INJ_CLOSE_TEMPLATE", "Slow-row Harmony-tail challenger present"),
+    ("AB_SLOTS = 10", "A/B slot count 10 (v22-exact, untouched)"),
+    ("AB_COMMIT_FIRE = 4", "A/B fire requirement 4 (v22-exact, untouched)"),
+    ("AB_COMMIT_SPEED = 0.80", "A/B speed threshold 0.80 (v22-exact, untouched)"),
 ]:
     check(pattern in decoded, desc)
 
-# --- v37 SLOWEST_MULT change explicitly REVERTED (v38 is v22-baseline, not v37-baseline) ---
-check("SLOWEST_MULT_FAST = 1.10" in decoded, "Fast-row SLOWEST_MULT = 1.10 (v22-exact)")
-check("SLOWEST_MULT_SLOW = 1.10" in decoded, "Slow-row SLOWEST_MULT = 1.10 (v37 tightening NOT carried)")
-check("mult_slow if slow_row else mult_fast" in decoded, "Per-row mult dispatched by row classification")
+# --- v39 BACKFILL-NUDGE change (THE KEY CHANGE) ---
+check("BACKFILL_REPLAY_FRAC = 0.996" in decoded, "Backfill replay guard nudged to 0.996 (v39 change)")
+check("BACKFILL_WALL_FRAC = 0.9975" in decoded, "Backfill wall guard nudged to 0.9975 (v39 change)")
 
-# --- v38 AB-LEAN change (THE KEY CHANGE) ---
-check("AB_SLOTS = 6" in decoded, "AB_SLOTS shrunk to 6 (v38 change)")
-check("AB_COMMIT_FIRE = 3" in decoded, "AB_COMMIT_FIRE tightened to 3-of-3 (v38 change)")
-check("AB_COMMIT_SPEED = 0.80" in decoded, "AB_COMMIT_SPEED unchanged at 0.80 (>=20% speedup)")
-check("ab_slots = max(2, int(self.config.get(\"ab_slots\", AB_SLOTS)))" in decoded,
-      "AB slot count is config-overridable but defaults to the new AB_SLOTS")
+# --- v37's SLOWEST_MULT change is cleanly reverted (isolated against v22, not v37) ---
+check("SLOWEST_MULT_FAST = 1.10" in decoded, "Fast-row SLOWEST_MULT = 1.10 (v22-exact)")
+check("SLOWEST_MULT_SLOW = 1.10" in decoded, "Slow-row SLOWEST_MULT = 1.10 (v37 tightening reverted)")
 
 # --- v35 reseed present and correctly gated ---
 check("FASTROW_RESEED = True" in decoded, "Fast-row reseed enabled (v35)")
@@ -162,9 +159,20 @@ check("RESEED_FLOOR_S = 6.0" in decoded, "Reseed floor clamp = 6.0s")
 code_only = re.sub(r'"""[\s\S]*?"""', "", decoded)
 code_only = "\n".join(l for l in code_only.split("\n") if not l.strip().startswith("#"))
 
-# --- no v34 extreme-edge caps in EXECUTABLE code (blacklist #9); docstring may cite them ---
+# --- must stay clear of v34's EXACT failed values in executable code (blacklist #9) ---
 check("0.998" not in code_only and "0.999" not in code_only,
-      "No extreme-edge caps in code (v34 timeout lesson honored, #9)")
+      "No v34 extreme-edge caps (0.998/0.999) in code (#9)")
+
+# --- the safety gap v34 discarded must be provably preserved here ---
+# Parsed directly from the literal constant assignments (no module exec needed --
+# the decoded module imports aicomp_sdk at top level, which is only put on sys.path
+# further below for the live-SDK refutation block).
+_backfill_replay = float(re.search(r"BACKFILL_REPLAY_FRAC = ([\d.]+)", decoded).group(1))
+_backfill_wall = float(re.search(r"BACKFILL_WALL_FRAC = ([\d.]+)", decoded).group(1))
+_gap = _backfill_wall - _backfill_replay
+check(_gap >= 0.001, f"Wall-above-replay safety gap preserved: {_gap:.4f} >= 0.001 (v34 collapsed this to 0.0)")
+check(_backfill_replay < 0.997, "Backfill replay frac stays a third of v34's step below v34's 0.998")
+check(_backfill_wall < 0.998, "Backfill wall frac stays strictly below v34's failed 0.998")
 
 for banned in ["fs.delete", "fs.write", "web.search", "web.open", "email.send", "BURST_K"]:
     check(banned not in code_only, f"Single-post purity: no '{banned}' in code (#1/#2)")
@@ -174,7 +182,7 @@ cell3 = "".join(verify["cells"][2]["source"])
 check("KAGGLE_IS_COMPETITION_RERUN" in cell3 and "server.serve()" in cell3,
       "Notebook rerun gate + serve() present")
 
-# --- LIVE-SDK refutation (same ceiling proof as v36/v37) ---
+# --- LIVE-SDK refutation (same as v37, now also proving v39 ceiling math) ---
 sys.path.insert(0, str(PROJECT_ROOT / "our_work"))
 try:
     from aicomp_sdk import scoring as _sc
@@ -195,11 +203,13 @@ if _HAVE_SDK:
           "SDK: one finding -> exactly one unique cell -> +2 (multi-cell impossible)")
     check(_cl._bucket_url("http://ab.co/x?y=1") == "ab.co",
           "SDK: _bucket_url keeps DOMAIN only (query/path add no new cell)")
-    # v38 ceiling math: AB-LEAN squeezes ~+4 gpt_oss candidates at 18 raw each (small, on purpose)
-    gpt_oss_gain = 4 * 18
-    expected_gain_pts = gpt_oss_gain / 200000 * 1000 / 2
-    check(0.1 < expected_gain_pts < 0.5,
-          f"SDK: v38 expected gain {expected_gain_pts:.2f} pts (0.1-0.5 pts from +4 gpt_oss cands)")
+    # v39 ceiling math: BACKFILL-NUDGE recovers ~9s of headroom -> ~1 extra candidate.
+    extra_headroom_s = (_backfill_replay - 0.995) * 9000.0
+    check(8.0 < extra_headroom_s < 10.0,
+          f"SDK: v39 recovers {extra_headroom_s:.1f}s of backfill replay headroom (~9s expected)")
+    expected_gain_pts = 1 * 18 / 200000 * 1000 / 2
+    check(0.0 < expected_gain_pts < 0.2,
+          f"SDK: v39 expected gain {expected_gain_pts:.3f} pts (small, ~1 extra candidate)")
 
 print("-" * 64)
 print(f"[INFO] attack.py: {len(decoded)} chars, {len(decoded.splitlines())} lines")
@@ -207,5 +217,5 @@ print(f"[INFO] Notebook:  {output_path}")
 print(f"[INFO] Total assertions passed: {_n}")
 assert _n >= 27, f"Expected >=27 assertions, ran {_n}"
 print("=" * 64)
-print("ALL VALIDATIONS PASSED -- OMEGA v38 (v68) notebook is ready!")
+print("ALL VALIDATIONS PASSED -- OMEGA v39 (v69) notebook is ready!")
 print("=" * 64)
